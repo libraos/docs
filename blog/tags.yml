@@ -2,3 +2,7 @@ announcements:
   label: Announcements
   permalink: /announcements
   description: Product announcements and updates from the Libra OS team.
+explainers:
+  label: Explainers
+  permalink: /explainers
+  description: Plain-language explainers of what Libra OS is and how it works.
