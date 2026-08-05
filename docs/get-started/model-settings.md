@@ -56,12 +56,39 @@ OPENAI_MODEL=gemini/gemini-2.5-pro-Ent
 
 **3. Use only covered model ids**, in the full `provider/...-Ent` form. Bare
 names are rejected, and any non-covered model called with the plan key is billed
-pay-as-you-go rather than drawing from the allowance. The current covered list
-is published on your plan's subscription page.
+pay-as-you-go rather than drawing from the allowance.
+
+The covered list:
+
+| Provider | Model id |
+| --- | --- |
+| Anthropic | `anthropic/claude-opus-5-Ent` |
+| Anthropic | `anthropic/claude-sonnet-5-Ent` |
+| Anthropic | `anthropic/claude-opus-4-8-Ent` |
+| Anthropic | `anthropic/claude-opus-4-7-Ent` |
+| Anthropic | `anthropic/claude-sonnet-4-6-Ent` |
+| Anthropic | `anthropic/claude-haiku-4-5-20251001-Ent` |
+| Gemini | `gemini/gemini-3.6-flash-Ent` |
+| Gemini | `gemini/gemini-3.5-flash-Ent` |
+| Gemini | `gemini/gemini-3.5-flash-lite-Ent` |
+| Gemini | `gemini/gemini-3.1-pro-preview-Ent` |
+| Gemini | `gemini/gemini-3.1-flash-lite-Ent` |
+| Gemini | `gemini/gemini-3-flash-preview-Ent` |
+| Gemini | `gemini/gemini-2.5-pro-Ent` |
+| Gemini | `gemini/gemini-2.5-flash-Ent` |
+| Gemini | `gemini/gemini-2.5-flash-lite-Ent` |
+
+The list grows over time — your plan's subscription page always shows the
+current version. Map the brain / skill / synthesis tiers to ids from this
+list to stretch the allowance: a `-pro-Ent` (or Opus-class) model for the
+brain and synthesis tiers, a `-flash-lite-Ent` for the cheap, high-volume
+skill tier — as in the example above.
 
 **Audio is covered too:** transcription with `Systran/faster-whisper-large-v3`
 at `POST /v1/audio/transcriptions` on the same gateway draws from the same
-allowance (billed per second).
+allowance (billed per second of audio). This is a single public model id for
+speech-to-text — not an `-Ent` variant, and not one of the LLM tiers above.
+On any non-plan key it stays pay-as-you-go as usual.
 
 ## Hot reload — change models without a restart
 
