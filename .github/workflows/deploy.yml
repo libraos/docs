@@ -1,0 +1,62 @@
+name: build & deploy docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install deps
+        run: npm install --no-audit --no-fund
+      - name: Build (static site + llms.txt)
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docs-build
+          path: build/
+          retention-days: 7
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: docs-build
+          path: build
+      - name: Check for deploy key
+        id: gate
+        run: |
+          if [ -n "${{ secrets.DEPLOY_SSH_KEY }}" ] && [ -n "${{ secrets.DEPLOY_TARGET }}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::DEPLOY_SSH_KEY / DEPLOY_TARGET secrets not set — built the site but skipping deploy. Add the secrets to publish to libraos.com/docs/."
+          fi
+      - name: Deploy to Caddy host (rsync)
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          # The target directory is exclusively this build's output, so --delete is safe here.
+          TARGET: ${{ secrets.DEPLOY_TARGET }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
+            build/ "$TARGET"

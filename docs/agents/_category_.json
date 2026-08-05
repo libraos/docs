@@ -1,0 +1,5 @@
+{
+  "label": "Building agents",
+  "position": 3,
+  "link": { "type": "doc", "id": "agents/overview" }
+}
