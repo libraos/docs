@@ -37,6 +37,32 @@ sudo mv libraos-linux-amd64 /usr/local/bin/libraos
 libraos --version
 ```
 
+## Start the server
+
+```bash
+export LIBRA_OS_PUBLIC_URL=http://0.0.0.0:8900
+export LIBRA_OS_ADMIN_EMAIL=...
+export LIBRA_OS_ADMIN_PASSWORD=...
+export LIBRA_OS_DATABASE_URL='postgres://...'
+export OPENAI_API_BASE=https://api.meganova.ai
+export OPENAI_API_KEY="sk-..."
+export LIBRA_OS_JWT_SECRET=$(openssl rand -base64 48)
+libraos serve
+```
+
+`LIBRA_OS_JWT_SECRET` signs every session and API token the server issues.
+Generate it once, store it with your other secrets, and reuse the same value
+across restarts and replicas — a new secret invalidates every existing login
+and token. With auth enabled, the server refuses to start if the secret is
+unset, left at a known default, or shorter than 16 bytes.
+
+To check the whole setup — environment, database, LLM gateway, and the
+running server — use the built-in audit:
+
+```bash
+libraos doctor deployment
+```
+
 ## Next steps
 
 - [Deploy Libra OS](/deployment) for your team — on-prem, VPC, or air-gapped.
