@@ -37,6 +37,19 @@ sudo mv libraos-linux-amd64 /usr/local/bin/libraos
 libraos --version
 ```
 
+## Start the server
+
+```bash
+export LIBRA_OS_PUBLIC_URL=http://0.0.0.0:8900
+export LIBRA_OS_ADMIN_EMAIL=...
+export LIBRA_OS_ADMIN_PASSWORD=...
+export LIBRA_OS_DATABASE_URL='postgres://...'
+export OPENAI_API_BASE=https://api.meganova.ai
+export OPENAI_API_KEY="sk-..." 
+export LIBRA_OS_JWT_SECRET=...
+libraos serve
+```
+
 ## Next steps
 
 - [Deploy Libra OS](/deployment) for your team — on-prem, VPC, or air-gapped.
