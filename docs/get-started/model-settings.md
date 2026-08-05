@@ -23,11 +23,18 @@ keep working forever, so renaming existing deployments is optional. Any
 OpenAI-compatible provider works — bring your own keys, point the tiers at
 local models, or mix per tier.
 
+## Pay-as-you-go or a token plan
+
+Billing through the gateway is **pay-as-you-go by default**: any API key works
+immediately, metered per token, no subscription required. A token plan (from
+**$249/month** — see [pricing](https://libraos.com/pricing/)) is the optional
+flat-rate alternative — a monthly fee that includes an enterprise-model usage
+allowance. If you're happy paying per token, you can skip the rest of this
+section.
+
 ## Using your token plan
 
-Token plans (from **$249/month** — see [pricing](https://libraos.com/pricing/))
-include an enterprise-model usage allowance. To draw from the allowance instead
-of paying per token:
+To draw from your plan's allowance instead of paying per token:
 
 **1. Use the plan key.** Your subscription page provisions a dedicated API key
 when the plan activates. The allowance only applies to that key — usage on any
