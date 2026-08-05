@@ -29,8 +29,12 @@ Billing through the gateway is **pay-as-you-go by default**: any API key works
 immediately, metered per token, no subscription required. A token plan (from
 **$249/month** — see [pricing](https://libraos.com/pricing/)) is the optional
 flat-rate alternative — a monthly fee that includes an enterprise-model usage
-allowance. If you're happy paying per token, you can skip the rest of this
-section.
+allowance, with usage running on the enterprise-grade `-Ent` model endpoints.
+
+For business deployments the token plan is **strongly recommended**: the
+covered `-Ent` ids carry enterprise-level security and data handling, on top
+of predictable billing. If you're evaluating or happy paying per token,
+pay-as-you-go works fine and you can skip the rest of this section.
 
 ## Using your token plan
 
