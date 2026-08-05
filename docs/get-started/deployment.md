@@ -35,6 +35,33 @@ Not a setting you toggle — an architectural property.
 - Eight supervised digital employees
 - An OpenAI-compatible endpoint fronting 100+ models with failover
 
+## Secrets & environment
+
+The server is its own identity provider: every login session and API token it
+issues is signed with `LIBRA_OS_JWT_SECRET`. The
+[getting-started guide](/getting-started) shows how to generate it; for a
+production deployment, also plan for:
+
+- **Replicas share one secret.** Every instance behind a load balancer (or in
+  a blue/green pair) must run the same `LIBRA_OS_JWT_SECRET`, or tokens minted
+  by one replica are rejected by the next.
+- **Store it like a credential.** Put it in your secret manager and inject it
+  at start — not in shell history, unit files, or compose files checked into
+  git. With auth enabled the server refuses to boot if the secret is unset,
+  a known default, or shorter than 16 bytes.
+- **Rotation logs everyone out.** Changing the secret invalidates every
+  outstanding session and token at once. That makes rotation a deliberate,
+  announced event — useful after a suspected leak, disruptive as routine
+  hygiene.
+- **Token lifetime is tunable.** `LIBRA_OS_ACCESS_TOKEN_TTL` sets how long
+  issued tokens live (a Go duration such as `720h`; unset defaults to 1 hour).
+  Longer lifetimes trade fewer re-logins for a longer exposure window on a
+  leaked token — and a wider blast radius when you do rotate the signing
+  secret.
+
+`libraos doctor deployment` audits all of this — environment, database, LLM
+gateway, and the running server — and prints a fix line for anything wrong.
+
 ## Reference stack
 
 For a container-based deployment, see the reference
