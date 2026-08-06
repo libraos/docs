@@ -90,6 +90,48 @@ allowance (billed per second of audio). This is a single public model id for
 speech-to-text — not an `-Ent` variant, and not one of the LLM tiers above.
 On any non-plan key it stays pay-as-you-go as usual.
 
+## Local models
+
+Everything above also runs fully local — the tiers point at a local
+OpenAI-compatible server instead of a hosted gateway. This is the usual
+configuration for air-gapped deployments, and there is no billing involved
+at all.
+
+**Generation (the LLM tiers).** Ollama and similar local servers expose an
+OpenAI-compatible API. Point the gateway settings at it and use the server's
+bare model names — locally-run Ollama is the one case that takes no vendor
+prefix:
+
+```bash
+OPENAI_API_BASE=http://localhost:11434/v1   # Ollama's OpenAI-compatible endpoint
+OPENAI_API_KEY=ollama                       # any non-empty value
+LIBRA_OS_BRAIN_MODEL=qwen3:32b
+LIBRA_OS_SKILL_MODEL=llama3.2:3b
+OPENAI_MODEL=qwen3:32b
+```
+
+**Embeddings.** Knowledge-base embeddings are configured independently of
+the generation endpoint, because a local generation server usually serves no
+embedder:
+
+- **Local embeddings via Ollama:** set `LIBRA_OS_OLLAMA_URL`
+  (e.g. `http://localhost:11434`). The default embedding model is
+  `snowflake-arctic-embed:l`; override with `LIBRA_OS_OLLAMA_EMBED_MODEL`.
+  Note the deliberate precedence rule: if a gateway embedding model is
+  pinned via `LIBRA_OS_EMBEDDING_MODEL`, it wins — the Ollama opt-in only
+  applies when no gateway model is set, so an Ollama URL configured for
+  other purposes can't silently reroute embeddings to the slower local path.
+- **Remote embeddings with local generation:** set
+  `LIBRA_OS_EMBEDDING_API_BASE` (and `LIBRA_OS_EMBEDDING_API_KEY`) to keep
+  embeddings on a dedicated endpoint while `OPENAI_API_BASE` points at your
+  local generation server.
+
+**Embedding dimensions must match the model.** Set `LIBRA_OS_EMBED_DIM` to
+the model's output size — `qwen3-embedding:8b` → 4096, `bge-m3` → 1024,
+`snowflake-arctic-embed:l` → 1024, `nomic-embed-text` → 768. The vector
+index is created at that dimension, so switching to a model with a different
+dimension means re-ingesting the knowledge base.
+
 ## Hot reload — change models without a restart
 
 Settings persist and reload at runtime via the settings API:
