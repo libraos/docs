@@ -87,7 +87,7 @@ upsell. Details at [libraos.com/pricing](https://libraos.com/pricing/).
 - **[Getting started (self-hosted)](/getting-started)** — download, install, and run your first query.
 - **[Deployment](/deployment)** — managed cloud, your cloud, or air-gapped on-prem.
 - **[Security](/security)** — the AI firewall, source-cited answers, and the offline license.
-- **[Model settings & token plans](/model-settings)** — point the routing tiers at any OpenAI-compatible endpoint, or at your plan's covered models.
+- **[Model settings](/model-settings)** — routing tiers on any OpenAI-compatible endpoint: pay-as-you-go, token plans, or fully local.
 - **[Create your first agent](/creating-an-agent)** — a working agent in three SDK calls: employee, skill agent, first message.
 - **[Defining employees in YAML](/employee-yaml)** — advanced: the declarative file format for employees and agents.
 - **[Customer support agent](/guides/customer-support)** — the most common deployment, from template to production.

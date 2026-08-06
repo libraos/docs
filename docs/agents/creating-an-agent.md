@@ -135,7 +135,7 @@ over SSE; Mode B calls a webhook you host.
 memory worker) with fallback chains, and cascades per-call → per-skill →
 per-agent → per-employee → server default. If your deployment runs on a token
 plan, use the covered model ids — see
-[Model settings & token plans](/model-settings).
+[Model settings](/model-settings).
 
 **Enforce output shape.** Set `output_type` to a JSON Schema and choose what
 happens on violation: `error`, `log`, or `repair`.
@@ -171,6 +171,6 @@ when you want model tiers, output contracts, and custom tools.
 ## Next steps
 
 - **[Defining employees in YAML](/employee-yaml)** — the declarative file format behind these SDK calls
-- **[Model settings & token plans](/model-settings)** — routing tiers and covered models
+- **[Model settings](/model-settings)** — routing tiers, billing, covered and local models
 - **[Core capabilities](/capabilities)** — the kernel, firewall, and knowledge base your agent runs on
 - **[SDK examples](https://github.com/libraos/sdk/tree/main/python/examples)** — every pattern above as a runnable script

@@ -1,11 +1,11 @@
 ---
 slug: /model-settings
 sidebar_position: 5
-title: Model settings & token plans
-description: Point the routing tiers at any OpenAI-compatible endpoint — or at your token plan's covered models.
+title: Model settings
+description: Routing tiers, pay-as-you-go and token-plan billing, covered models, and fully local deployment.
 ---
 
-# Model settings & token plans
+# Model settings
 
 Libra OS routes work across three model tiers. Each tier is just a model id
 behind an OpenAI-compatible endpoint, so configuration is a key, a base URL, and

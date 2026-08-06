@@ -128,6 +128,6 @@ your compliance record.
 
 - **[Create your first agent](/creating-an-agent)** — employee, agent, first message
 - **[Defining employees in YAML](/employee-yaml)** — every field, grouped by what it controls
-- **[Model settings & token plans](/model-settings)** — routing tiers, fallback chains, covered models
+- **[Model settings](/model-settings)** — routing tiers, fallback chains, covered and local models
 - **[Core capabilities](/capabilities)** — the kernel, firewall, and knowledge base underneath
 - **[Security](/security)** — the AI firewall and the sovereignty story in depth
