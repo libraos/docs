@@ -113,12 +113,46 @@ optional unless marked; absent fields keep safe defaults.
 ### Models
 
 `model_config` has three slots — `answer`, `planner`, `skill` — each with a
-`primary` and an optional `fallback` chain. Model ids always carry a
-`provider/` prefix. Resolution cascades **per slot**:
+`primary` and an optional `fallback` chain. Resolution cascades **per slot**:
 per-call → per-skill → per-agent → per-employee → server default. The legacy
 single `model:` field still works; `model_config` takes precedence when both
-are present. On a token plan, use the covered ids — see
-[Model settings & token plans](/model-settings).
+are present.
+
+The YAML never declares "local" or "cloud" — it just names model ids, and the
+deployment's gateway (`OPENAI_API_BASE`) determines which namespace those ids
+live in. Against a **routing gateway**, ids carry a `provider/` prefix — with
+the covered `-Ent` variants on a [token plan](/model-settings):
+
+```yaml
+model_config:
+  answer:
+    primary: anthropic/claude-sonnet-5-Ent
+    fallback: [gemini/gemini-2.5-pro-Ent]
+  planner:
+    primary: anthropic/claude-opus-5-Ent
+  skill:
+    primary: gemini/gemini-2.5-flash-lite-Ent
+```
+
+Against a **local Ollama server** ([Local models](/model-settings#local-models)),
+ids are the server's bare model names — no prefix, per the standing Ollama
+exception:
+
+```yaml
+model_config:
+  answer:
+    primary: qwen3:32b
+  planner:
+    primary: qwen3:32b
+  skill:
+    primary: llama3.2:3b
+```
+
+Pin only ids your gateway actually serves — anything else 404s at call time.
+For an employee meant to run on **both** kinds of deployment, pin nothing:
+with no `model_config` it inherits the deployment's default models through
+the cascade above, so the identical YAML works on cloud and air-gapped
+installs alike (this is why the SDK templates ship modelless).
 
 ### Skills and tools
 
