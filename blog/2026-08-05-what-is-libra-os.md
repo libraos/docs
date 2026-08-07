@@ -1,6 +1,6 @@
 ---
 slug: what-is-libra-os
-title: "What is Libra OS? The AI Operating System, explained"
+title: "What is Libra OS? The operating system for the AI workforce, explained"
 authors: [libraos]
 tags: [explainers]
 ---

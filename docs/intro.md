@@ -7,7 +7,7 @@ description: What Libra OS is, why it exists, and how the documentation is organ
 
 # Libra OS
 
-**The AI Operating System** — one sovereign AI layer over everything your
+**The Operating System for the AI Workforce** — one sovereign AI layer over everything your
 company knows.
 
 One 59MB binary. Install it inside your own infrastructure and eight supervised
