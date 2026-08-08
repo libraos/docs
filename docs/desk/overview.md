@@ -27,6 +27,39 @@ If that sounds like reviewing a pull request, that is deliberate. Reviewing the
 words your company says to a customer deserves the same treatment as reviewing
 the code it ships.
 
+## Who it's for
+
+Desk is built for the shared, customer-facing inbox of a small expert team —
+intake, support, and the replies that carry your name. A visa question, a
+support ticket, a prospect chatting on your website: work where most answers
+are re-derivable from documents the firm already has, but every answer still
+needs a considered reply from someone whose time is the scarcest thing in the
+building.
+
+One loop runs underneath all of it: a message arrives on any channel — the
+website widget, the mailbox, the helpdesk — and is classified and routed; an
+agent grounded in your workspace drafts the reply; the draft lands in the
+right group's queue; a person approves, edits, or rejects; the send goes out
+with a full [audit entry](/docs/desk-audit/). Closed cases flow back into the
+knowledge the next draft starts from.
+
+Three problems this dissolves, together:
+
+- **The inbox is where expert teams drown.** High volume, low variance —
+  exactly the work a grounded drafter automates.
+- **The outbound word can't be trusted to a bot.** For a law practice or a
+  school, one hallucinated sentence sent to a client is a liability event.
+  Desk resolves the tension instead of picking a side: the AI does the
+  volume, a person keeps the signature.
+- **Nobody staffs a platform team for this.** Helpdesk, CRM, knowledge, and
+  the AI layer arrive pre-fused around the one loop, on one deployment.
+
+The economics in one line: Desk converts *replying* — minutes of an expert's
+time per message — into *reviewing*, seconds, without converting
+accountability into hope. The queue is where the time is saved; the
+[audit trail](/docs/desk-audit/) is why a regulated team is allowed to save
+it.
+
 ## What you get
 
 | Surface | What it is |
