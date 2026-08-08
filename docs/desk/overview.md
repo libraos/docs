@@ -32,11 +32,11 @@ the code it ships.
 | Surface | What it is |
 |---|---|
 | **Today** | One attention queue: what is ready for review, what still needs a response, what is done |
-| **Tickets** | The shared support queue, grouped by workflow state rather than by ticket status |
+| **Tickets** | The shared support queue, grouped by what should happen next — *needs a draft*, *awaiting approval*, *replied* — rather than by ticket status |
 | **Organizations / Contacts** | The CRM records the work is about |
 | **Workspaces** | Per-project knowledge — the documents an agent grounds its answers in |
 | **Content / Campaigns** | Drafting surfaces with the same approval discipline |
-| **Mail** | The employee's own work mailbox |
+| **Mail** | Each member's own work mailbox |
 
 Every one of these carries a **copilot** docked on the right, grounded in
 whatever is on screen — the list you are looking at, or the record you opened.
@@ -47,10 +47,13 @@ Each agent runs at a level you choose:
 
 - **Draft only** — it never acts, it only proposes.
 - **Approval** — it may act once a person approves.
-- **Auto** — it acts within its grant.
+- **Auto** — it acts within its **grant**: the explicit list of tools and
+  channels it may use without review, issued by an admin and recorded in the
+  [audit trail](/docs/desk-audit/). Anything outside the grant still lands in
+  the queue as a draft.
 
 New agents start at draft-only. Moving an agent up is a decision someone makes
-on purpose, and the approval queue is where that trust is earned.
+on purpose, in Admin.
 
 ## Where it runs
 

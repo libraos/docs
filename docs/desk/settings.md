@@ -12,9 +12,9 @@ them is not cosmetic — it is who the decision belongs to.
 
 | | **Settings** | **Admin** |
 |---|---|---|
-| Who opens it | every employee | admins only |
+| Who opens it | every member | admins only |
 | What it changes | your own preferences and your own connections | organization policy, for everyone |
-| Example | which language you read the app in | which services employees may connect at all |
+| Example | which language you read the app in | which services members may connect at all |
 
 The rule: **Settings never overrides Admin.** Where a personal setting is
 constrained by policy, Settings says so plainly and names who can change it,
@@ -34,14 +34,15 @@ rather than showing you a control that quietly does nothing.
 - **Connectors** — the services this deployment runs, and their credentials.
 - **Employees and groups** — who reviews what, and which group approves which
   queue.
-- **Agents** — each agent's model, knowledge bindings and autonomy level.
+- **Agents** — each agent's model, knowledge bindings and
+  [autonomy level](/docs/desk/#autonomy-is-a-dial-not-a-switch).
 - **Imports** — one-time backfills from a system you are moving off.
 
 Admin opens in its own tab. It is a separate console, not a page of the app.
 
 ## Why a non-admin sees fewer doors
 
-Desk does not show an employee a control that will refuse them. The connector
+Desk does not show a member a control that will refuse them. The connector
 console is admin-gated by the kernel on **every** route — reads included — so
 the navigation entry is not rendered for a non-admin at all, rather than
 leading to a wall.

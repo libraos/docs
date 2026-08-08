@@ -2,12 +2,16 @@
 slug: /desk-connections
 sidebar_position: 3
 title: Connections
-description: Desk has two kinds of connection — the organization's, configured by an admin, and each employee's own. Admins decide which services employees may connect; employees connect their own accounts.
+description: Desk has two kinds of connection — the organization's, configured by an admin, and each member's own. Admins decide which services members may connect; members connect their own accounts.
 ---
 
 # Connections
 
-Desk connects to outside services in two different ways, and they are governed
+**Connection is access; approval is permission.** Connecting a service lets an
+agent reach it; nothing about connecting lets the agent act through it —
+outbound actions remain drafts until a person approves.
+
+With that split in place: Desk has two kinds of connection, governed
 differently because their blast radius is different.
 
 ## Organization connections
@@ -25,28 +29,28 @@ the website crawler, a Ghost blog.
 
 ## Personal connections
 
-Each employee connecting **their own account** — their Gmail, their calendar.
+Each member connecting **their own account** — their Gmail, their calendar.
 The credential belongs to that person, is stored separately from the
 organization's, and only they can use it.
 
 The two-step model matches how Claude's own Google Workspace connectors work:
 
-1. **An admin opens the service.** Until then it does not exist for employees.
-2. **Each employee connects their own account**, from *Settings → Connections*.
+1. **An admin opens the service.** Until then it does not exist for members.
+2. **Each member connects their own account**, from *Settings → Connections*.
 
 This is deny-by-default and enforced server-side, not merely hidden in the UI.
-A service nobody opened is one this deployment holds no employee credentials
-for — which is the point. An employee cannot make the company hold their
+A service nobody opened is one this deployment holds no member credentials
+for — which is the point. A member cannot make the company hold their
 Google credentials by finding the right URL.
 
 ### What an admin does
 
 In the connector console, the **Personal connections** section lists services
 that are personal by nature — Gmail, Google Calendar, Google Drive, Notion,
-GitHub — each with one toggle. Turning it on permits employees to connect that
+GitHub — each with one toggle. Turning it on permits members to connect that
 service. It does **not** mean the organization runs a connector for it.
 
-### What an employee does
+### What a member does
 
 *Settings → Connections* shows the services their organization has opened, and
 their own connections to them. Connecting asks only for that service's
@@ -65,9 +69,11 @@ policy change must never strand a credential with no way to revoke it.
 - Personal credentials are never readable by an admin. The console can see that
   a service is open; it cannot read anyone's connection to it.
 
-## Actions still go through approval
+## Where the drafts land
 
-Connecting a service does not grant an agent the right to act through it.
-Outbound actions remain drafts until a person approves them, and group-bound
-connectors route those approvals to the group you nominate. Connection is
-access; approval is permission.
+Connectors can be **group-bound**: a connector may name the group whose queue
+receives its drafts — the support intake to the support group, the corporate
+mailbox to whoever owns outbound mail. A connector with no group bound routes
+its drafts to the admin-only queue. Binding is part of the connector's
+configuration and can be changed there. Who's in a group is managed under
+[Employees and groups](/docs/desk-settings/#admin--the-organizations).
