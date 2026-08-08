@@ -1,0 +1,8 @@
+{
+  "label": "Libra Desk",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "The company workspace on Libra OS: a shared queue where agents draft and people approve, plus the settings that decide who controls what."
+  }
+}
