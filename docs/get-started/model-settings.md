@@ -62,6 +62,7 @@ The covered list:
 
 | Provider | Model id |
 | --- | --- |
+| Anthropic | `anthropic/claude-fable-5-Ent` |
 | Anthropic | `anthropic/claude-opus-5-Ent` |
 | Anthropic | `anthropic/claude-sonnet-5-Ent` |
 | Anthropic | `anthropic/claude-opus-4-8-Ent` |
