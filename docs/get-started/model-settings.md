@@ -133,6 +133,36 @@ the model's output size — `qwen3-embedding:8b` → 4096, `bge-m3` → 1024,
 index is created at that dimension, so switching to a model with a different
 dimension means re-ingesting the knowledge base.
 
+## Web search
+
+Agent web search and the `deep_research` pipeline use a pluggable search
+backend, selected with `LIBRA_OS_DEEP_SEARCH_BACKEND`:
+
+| Backend | What it selects | Needs |
+| ------- | --------------- | ----- |
+| `auto` (default) | The gateway's managed search when a gateway key is set — same key and quota as your LLM traffic — else Tavily if configured, else the built-in fallback cascade | — |
+| `meganova` | The gateway's managed search explicitly | `MEGANOVA_CLOUD_KEY` (legacy alias `MEGANOVA_API_KEY`) |
+| `tavily` | Tavily | `TAVILY_API_KEY`; depth via `LIBRA_OS_DEEP_SEARCH_DEPTH` (`basic` \| `advanced`) |
+| `brave` | Brave Search | `BRAVE_API_KEY` |
+| `exa` | Exa | `EXA_API_KEY` |
+| `searxng` | A SearXNG instance you host — the self-contained option for restricted networks | `SEARXNG_URL` |
+
+A typo'd backend name is called out loudly at boot and degrades to the
+built-in cascade rather than refusing to start; a configured backend that is
+unavailable or out of credits falls back the same way.
+
+**On a token plan, managed web search is included.** Searches and page
+fetches made with the plan key draw on the same monthly allowance as model
+usage, at $0.002 per search and per fetch — one key, one quota, for models
+and search both (that is what the `auto` default consolidates). The
+entitlement is per key: the same search on any other key is billed
+pay-as-you-go.
+
+Depth of the research pipeline is tunable:
+`LIBRA_OS_DEEP_SEARCH_ASPECTS` (aspects per call, 1–10, default 5),
+`LIBRA_OS_DEEP_SEARCH_QUERIES_PER_ASPECT` (1–15, default 10), and
+`LIBRA_OS_DEEP_SEARCH_TIMEOUT_SEC`.
+
 ## Hot reload — change models without a restart
 
 Settings persist and reload at runtime via the settings API:
