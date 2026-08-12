@@ -49,7 +49,7 @@ The agent runtime is built around five concepts:
 | **Agent** | A runnable behavior bound to an employee: `skill` handles a single delegated call, `persona` holds a multi-turn conversation. Its Markdown body is the system prompt |
 | **Skill** | A sub-agent an agent can delegate to — each runs with its own prompt and model slot, dispatched by the planner |
 | **Planner** | The decomposition tier. With `brain: true`, it breaks a task across the agent's skills and routes each piece to the model that fits |
-| **Memory** | Conversation state, keyed automatically on the (API key, end user, agent) triple — there is no session object to create or manage |
+| **Memory** | Conversation state, keyed automatically on the (API key, end user, agent) triple — there is no session object to create or manage. The longer-lived layer — collections, workspaces, cross-session facts — is [Workspaces & memory](/workspaces-memory) |
 
 ## How it works
 

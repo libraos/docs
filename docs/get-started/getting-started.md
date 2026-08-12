@@ -123,8 +123,8 @@ Two fields to notice:
 
 - **`retrieved_chunks`** is empty and **`grounding`** says so — you haven't
   given it any knowledge yet. Once you ingest documents and bind them to an
-  employee, this same call answers *from your sources* and lists the exact
-  files each answer drew on. That list is the difference between an AI that
+  employee ([Workspaces & memory](/workspaces-memory)), this same call
+  answers *from your sources* and lists the exact files each answer drew on. That list is the difference between an AI that
   sounds right and one you can check.
 - **`conversation_id`** — pass it back on the next call to continue the
   conversation.

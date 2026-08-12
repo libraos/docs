@@ -67,7 +67,7 @@ it.
 | **Today** | One attention queue: what is ready for review, what still needs a response, what is done |
 | **Tickets** | The shared support queue, grouped by what should happen next — *needs a draft*, *awaiting approval*, *replied* — rather than by ticket status |
 | **Organizations / Contacts** | The CRM records the work is about |
-| **Workspaces** | Per-project knowledge — the documents an agent grounds its answers in |
+| **Workspaces** | Per-project knowledge — the documents an agent grounds its answers in ([how this layer works](/workspaces-memory)) |
 | **Content / Campaigns** | Drafting surfaces with the same approval discipline |
 | **Mail** | Each member's own work mailbox |
 
