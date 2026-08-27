@@ -23,20 +23,28 @@ rather than showing you a control that quietly does nothing.
 ## Settings — yours
 
 - **Language** — English or 简体中文, remembered per person.
-- **Connections** — the state of your own working connections. Your corporate
-  mailbox appears here as *Working for your account* or *Not enabled by your
-  organization*; it is labelled **Managed by your organization** because you
-  cannot turn it on yourself, and no toggle is shown that would fail.
+- **Connections** — whether your corporate mailbox is working for your
+  account, and a link to the desk's connections. The mailbox row reads
+  *Working for your account* or *Not enabled by your organization*; it is
+  labelled **Managed by your organization** because you cannot turn it on
+  yourself, and no toggle is shown that would fail. There is no private list
+  of your own connections — every connection belongs to the desk (see
+  [Connections](/docs/desk-connections/)).
 - **Your work** — how many queued decisions are waiting on you.
 
 ## Admin — the organization's
 
-- **Connectors** — the services this deployment runs, and their credentials.
-- **Employees and groups** — who reviews what, and which group approves which
-  queue.
-- **Agents** — each agent's model, knowledge bindings and
-  [autonomy level](/docs/desk/#autonomy-is-a-dial-not-a-switch).
-- **Imports** — one-time backfills from a system you are moving off.
+- **Agents** — each agent's model, instructions, knowledge bindings,
+  connections, automations, permissions and
+  [autonomy level](/docs/desk/#autonomy-is-a-dial-not-a-switch); department
+  templates that provision an agent with its approval group.
+- **People** — employees and groups: who reviews what, and which group
+  approves which queue.
+- **Connections & data** — org connectors, the website widget, corporate
+  email, knowledge sources, imports from a system you are moving off, and the
+  Project Brain taxonomy.
+- **Governance** — the approval ledger and per-agent autonomy.
+- **Advanced** — usage and limits, model configuration, analytics.
 
 Admin opens in its own tab. It is a separate console, not a page of the app.
 

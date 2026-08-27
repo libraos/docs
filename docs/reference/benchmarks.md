@@ -14,7 +14,7 @@ system layer, not a bigger model.
 | | Result | What it means |
 | --- | --- | --- |
 | **GAIA** — public agentic benchmark | **+18.9 pts** | A full model generation of improvement, from the orchestration layer alone |
-| **Grounded scale** | **256** employees per 8×H100 node, 98.3% grounded success | We measure grounded answers, not HTTP 200s |
+| **Grounded scale** | **256** employees per 8×H100 node, 98.0% grounded success (single run) | We measure grounded answers, not HTTP 200s |
 | **Token economy** | **23×** fewer tokens per task (~27K vs ~615K) | Under a tenth of the cost per answer |
 | **AgentDojo** — prompt-injection defense | attack success **26.8% → 17.3%**, benign utility held at **90.7%** | Hardened without making the system useless |
 
