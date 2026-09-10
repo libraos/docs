@@ -34,6 +34,10 @@ your own without adopting Desk's interface or workflow.
    [background tasks](/durable-runs), and check [deployment](/deployment)
    and [portability](/portability) requirements.
 
+6. **Build an application on it:** [Build on Libra OS](/build-on-libraos)
+   covers the SDK, the published API contract, and the CLI — start there if you
+   are writing against a deployment rather than operating one.
+
 ## Understand the objects
 
 | Object | Developer responsibility |

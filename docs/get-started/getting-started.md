@@ -312,6 +312,8 @@ docker exec libraos libraos doctor deployment
 
 ## What's next
 
+- **[Build on Libra OS](/build-on-libraos)** — the SDK, the API contract and
+  the CLI. Start here if you are writing an application against a deployment.
 - **[Create your first agent](/creating-an-agent)** — the same thing from the
   Python SDK, with response parsing and conversation history.
 - **[Define employees in YAML](/employee-yaml)** — the filesystem-canonical
