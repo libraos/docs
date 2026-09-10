@@ -34,22 +34,24 @@ Give an agent the least of these that does its job. `search_web` and
 in parallel and synthesizes — powerful, and the most expensive thing on this
 page.
 
-## Choose a backend
+## Configuration
 
-Search runs through a provider. The managed gateway is the supported path and
-needs one credential:
+There is nothing to configure.
 
-```bash
-MEGANOVA_CLOUD_KEY=...
-```
+Search and page-fetch run on the **same gateway as your model tiers**, so they
+reuse the credential you already set for chat. If `OPENAI_API_KEY` and
+`OPENAI_API_BASE` are working, web search works.
 
-That is the whole configuration. If you would rather bring your own provider
-keys, set them and they are used as a fallback chain behind the gateway; with
-no gateway key they become the primary. Pin one explicitly with
-`LIBRA_OS_WEB_SEARCH`.
+That is deliberate. It used to take a second variable naming the same
+credential for the same host — and a deployment could have chat working
+perfectly while web search silently did nothing, because nobody knew the
+second variable existed.
 
-Page fetching is separate from search and is chosen with
-`LIBRA_OS_WEB_FETCHER`. The default is fine unless you self-host a crawler.
+**Bringing your own provider.** Set your own search keys and they are used
+instead, as a fallback chain behind the gateway; with no gateway configured
+they become the primary. Pin one explicitly with `LIBRA_OS_WEB_SEARCH`. Page
+fetching is chosen separately with `LIBRA_OS_WEB_FETCHER` — the default is
+fine unless you self-host a crawler.
 
 ## What a result actually is
 
