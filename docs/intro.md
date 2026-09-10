@@ -92,6 +92,7 @@ upsell. Details at [libraos.com/pricing](https://libraos.com/pricing/).
 - **[Defining employees in YAML](/employee-yaml)** — advanced: the declarative file format for employees and agents.
 - **[Customer support agent](/guides/customer-support)** — the most common deployment, from template to production.
 - **[Core capabilities](/capabilities)** — the kernel, model routing, packs, and the SDK.
+- **[Build on Libra OS](/build-on-libraos)** — building an application on top: the SDK, the published API contract, and what the platform handles so you do not have to.
 - **[Benchmarks](/benchmarks)** — measured, not marketed: same-model A/B results.
 
 This site is the user guide and reference for running Libra OS. It is
