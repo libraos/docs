@@ -134,6 +134,8 @@ answering with its evidence attached.
 
 ## What's next
 
+- **[Build on Libra OS](/build-on-libraos)** — the SDK, the API contract and
+  the CLI. Start here if you are writing an application against a deployment.
 - **[Create your first agent](/creating-an-agent)** — the same thing from the
   Python SDK: employee, agent, message, in three calls.
 - **[Define employees in YAML](/employee-yaml)** — the filesystem-canonical
