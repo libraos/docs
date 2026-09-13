@@ -30,6 +30,10 @@ choose where on the spectrum to sit, from fully cloud to fully air-gapped.
 Per-agent activity, token consumption, task volume, and firewall catch rate —
 the same dashboard we use to run deployments is the one you get.
 
+Building your own admin surface over the registry instead? See
+[Listing agents](/listing-agents) — two endpoints return agents and they
+answer different questions.
+
 ## Knowledge Packs
 
 Industry knowledge as installable modules, built from licensed and public
