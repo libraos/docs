@@ -47,6 +47,9 @@ default to allow, write tools to ask.
 
 ## Employee-connected services
 
+Here “employee” means a signed-in human member of the organization, not a
+runtime employee record or an agent.
+
 An admin can open a service — Gmail, Google Calendar, Google Drive, Notion,
 GitHub — so that employees may connect it **for the desk**. The employee
 signs in with whatever account they have at the provider; the connection that

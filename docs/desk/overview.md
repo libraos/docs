@@ -12,7 +12,10 @@ platform — the agent runtime, model routing, knowledge indexing and identity.
 Desk is what your team actually opens: a shared queue of customer work, with
 agents drafting and people deciding.
 
-A deployed instance is called *a desk*.
+A deployed instance is called *a desk*. In the People screens, employees are
+human organization members; in the runtime YAML, an employee is a separate
+configuration record. [Employees, agents, and tools](/agents) explains the
+terms used by developers.
 
 ## The shape of the product
 
@@ -128,6 +131,14 @@ connected service is set per tool — **allow**, **ask** (the call lands in the
 approval queue), or **never** — and contact-record access per agent is
 **none / read / read-write**, deny by default. There is also a per-connector
 **kill switch** that stops filing and auto-approval at once.
+
+## Building a different application
+
+Desk's queues, navigation, connectors, and autonomy workflow are application
+features. Calling the kernel's chat API does not create a Desk ticket or approval
+queue entry automatically. Your integration must connect those workflows or
+implement its own, using [agent invocation](/calling-agents) and the relevant
+action APIs.
 
 ## Where it runs
 

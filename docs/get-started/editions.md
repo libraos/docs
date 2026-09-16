@@ -1,60 +1,45 @@
 ---
 slug: /editions
-sidebar_position: 2
+sidebar_position: 3
 title: Cloud vs Self-Hosted
-description: Libra OS ships in two editions — hosted Cloud and sovereign Self-Hosted. Same engine, same agents, same API; choose by who runs the infrastructure.
+description: Choose who operates Libra OS, where its stores run, and which external services process your data.
 ---
 
 # Cloud vs Self-Hosted
 
-Libra OS comes in two editions. They are the **same product** — the same engine,
-the same eight supervised employees, the same OpenAI-compatible API and
-[`libraos` SDK](/creating-an-agent). What differs is who runs the servers and
-where your data lives.
+Both editions use the Libra OS runtime and agent-definition format. Choose
+based on who operates the deployment and where data may be stored and processed.
 
-| | **Libra OS Cloud** | **Libra OS Self-Hosted** |
+| | Cloud | Self-Hosted |
 | --- | --- | --- |
-| Get started | [Sign up free](/cloud) — workspace in minutes | [Install](/getting-started) a 59MB binary |
-| Infrastructure | We run and update it | Your hardware — on-prem, VPC, or air-gapped |
-| Data residency | Our managed environment | Never leaves your network |
-| Compliance posture | Managed | SOC 2 Type II certified · HIPAA-ready · air-gapped |
-| Updates | Automatic | You choose when to upgrade |
-| Best for | Getting started fast, smaller teams | Regulated, sovereign, or offline work |
-| Pricing | Free tier, then [from $249/mo](https://libraos.com/pricing/) | Free to start; commercial license per node |
+| Start | [Request private-beta access](/cloud) | [Install and configure the server](/getting-started) |
+| Operations | Managed during onboarding and service operation | Your team runs and updates it |
+| Storage | Assigned managed environment | Your configured databases and filesystem |
+| Model processing | Configured providers and service terms | Hosted providers or local models you configure |
+| Offline operation | Confirm available deployment options | Requires local models, embeddings, and compatible tools |
+| Agents | Configured for your workload | Created through APIs, files, or available setup tooling |
 
-## Same engine, either way
+Self-hosting does not automatically prevent outbound model, embedding, search,
+or callback traffic. See [Security](/security).
 
-Both editions run the identical Libra OS runtime and the identical agent model.
-Anything you read in [Building agents](/creating-an-agent),
-[Defining employees in YAML](/employee-yaml), the [Guides](/guides/customer-support),
-or [Model settings](/model-settings) applies to **both** — the only thing that
-changes between them is the base URL and API key your clients point at.
+## Same interfaces, environment-dependent capabilities
 
-That is the point of shipping one product in two editions: you never learn two
-systems, and you never rebuild when you switch.
+An application can use the same API shapes against either edition, but must
+supply the correct base URL, credential, and installed agent ID. The available
+models, tool services, persistence, permissions, and release versions can differ.
+Check [Portability](/portability) before moving an integration.
 
 ## Moving between editions
 
-Because the two editions are the same Libra OS, an employee built in one runs in
-the other unchanged. Employees are portable bundles — agents, prompts,
-knowledge-collection bindings, and configuration — that export from one
-deployment and import into another:
+1. Export the employee/agent definitions and the supported knowledge bundle.
+2. Provision the destination runtime and its stores.
+3. Import definitions and knowledge; verify collection bindings.
+4. Configure destination credentials, model IDs, tool callbacks, and ownership.
+5. Run your integration and evaluation checks before redirecting traffic.
 
-- **Cloud → Self-Hosted** — the common path: prototype fast on Cloud, then move
-  to your own infrastructure when compliance, data-residency, or scale calls for
-  it. Export your workspace, stand up a self-hosted binary, import. No agent
-  rebuild, no prompt rewrite.
-- **Self-Hosted → Cloud** — hand operations to us for a team or workload that no
-  longer needs to stay on your hardware.
+An employee bundle does not promise to move all conversation history,
+observational memory, job state, audit records, or external credentials.
+Plan those separately if your migration needs them.
 
-## How to choose
-
-- **Start on Cloud if** you want to evaluate quickly, you're a smaller team, or
-  you don't have a hard data-residency requirement. It's the fastest path from
-  idea to a working assistant. → [Libra OS Cloud](/cloud)
-- **Start on Self-Hosted if** your data cannot leave your network, you need
-  air-gapped or on-prem deployment, or you're in a regulated environment where
-  the sovereignty guarantees are the requirement. → [Getting started](/getting-started)
-
-Not sure? Start free on Cloud today — you can always move to self-hosted later
-without rebuilding anything.
+For current access and commercial terms, see [Cloud](/cloud) and
+[pricing](https://libraos.com/pricing/).

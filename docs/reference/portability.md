@@ -29,8 +29,10 @@ These do not depend on the environment:
 - audit trails, `grounding` verdicts, `retrieved_chunks`, `citations_verified`
 - role and collection authorization
 
-Write an agent against one shape and it loads in all three. What changes is
-what its *tools* can reach.
+Definitions can be moved between these environments. Match server versions,
+restore supported resources, and configure ownership, credentials, model IDs,
+and bindings at the destination. Portability does not imply shared state or an
+automatic migration of conversations, jobs, or audit history.
 
 ## Degrades by environment
 
@@ -54,7 +56,8 @@ embeddings configured, a healthy boot, and keyword-only retrieval.
 **Check rather than assume:**
 
 ```bash
-curl -s localhost:8900/api/capabilities | jq .retrieval
+curl --fail-with-body -sS "$LIBRA_OS_URL/api/capabilities" \
+  -H "Authorization: Bearer $LIBRA_OS_API_KEY" | jq .retrieval
 ```
 
 `"vector_search": true` means semantic. When it is false, answers carry
@@ -65,7 +68,7 @@ the log.
 
 | environment | behaviour |
 | --- | --- |
-| gateway configured | full search + page fetch |
+| compatible search gateway and credential configured | search + page fetch supported by that service |
 | your own provider keys | full, through your provider |
 | **no backend** | tools return an explicit *"no search backend configured"* note |
 
@@ -89,9 +92,9 @@ An operator can opt out explicitly, and the choice is logged.
 
 ### Models
 
-Any OpenAI-compatible endpoint works, per tier. Point them at a gateway, at
-your own vLLM, or at a mix. A fully local deployment sets the planner and
-skill tiers at a local endpoint and never calls out.
+Use an endpoint compatible with the API features your agents require. A fully
+local deployment configures the answer, planner, and skill tiers, embeddings,
+and any memory workers locally, and checks external tool dependencies.
 
 Embeddings have a local path too — a local embedding server rather than the
 gateway — so a deployment where even embeddings must not leave the building is

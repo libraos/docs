@@ -1,97 +1,62 @@
 ---
 slug: /cloud
-sidebar_position: 1
+sidebar_position: 2
 title: Libra OS Cloud
-description: The hosted, sign-up-and-go edition — start free in minutes with no install, connect your website, and write blogs and docs.
+description: Private-beta access to a managed Libra OS deployment and the information developers need to connect.
 ---
 
 # Libra OS Cloud
 
-Libra OS Cloud is the **hosted edition**: we run the infrastructure, so you go
-from sign-up to a working workspace in minutes — no binary, no database, no
-Kubernetes. It is the same Libra OS engine and the same eight supervised digital
-employees you would run yourself; the only difference is who operates the
-servers.
+Libra OS Cloud is the hosted edition, currently available through **private-beta
+onboarding**. Request access at [libraos.com/signup](https://libraos.com/signup/).
+Submitting that form requests an invitation; it does not immediately provision
+a workspace.
 
-Prefer to run it on your own hardware — on-prem, VPC, or fully air-gapped? That
-is [Libra OS Self-Hosted](/getting-started), and it is the same product. See
-[Cloud vs Self-Hosted](/editions) to choose.
+To start without an invitation, use [Self-Hosted](/getting-started).
 
-## 1. Sign up
+## Before you integrate
 
-Create a free workspace at **[app.libraos.com/signup](https://app.libraos.com/signup)**.
-No credit card — the free tier is enough to evaluate. Your workspace is
-provisioned on sign-up, at `your-workspace.libraos.com`.
+Your onboarding contact supplies your deployment URL, supported server version,
+credentials, and available model configuration. Use those values rather than
+assuming a workspace hostname, a default agent, or a particular model is present.
 
-## 2. Meet your employees
+The runtime APIs follow the same conventions as Self-Hosted. Feature availability
+also depends on release version, configured services, and enabled tools.
+See [Cloud vs Self-Hosted](/editions) and [Portability](/portability).
 
-Your workspace arrives with eight supervised digital employees ready to work —
-support, document analysis, content, and more. Everything the
-[self-hosted quickstart](/getting-started) does after install, you have on
-sign-up instead.
+## Connect your application
 
-## 3. Connect your website
+Set the URL and bearer credential you received:
 
-Point Libra OS at your site. It crawls your pages into a private knowledge base,
-and from then on your assistant answers **from your own content, with a citation
-to the page each fact came from** — the same knowledge-grounding described in
-[Building a customer support agent](/guides/customer-support), with the crawl and
-collection set up for you.
-
-```
-Settings → Knowledge → Connect a website → https://your-company.com
+```bash
+export LIBRA_OS_URL=https://your-assigned-host.example
+export LIBRA_OS_API_KEY='your-bearer-token'
 ```
 
-## 4. Talk to it — chat or API
+Follow [Create your first agent](/creating-an-agent) to create and call an agent,
+or call an existing agent using the ID supplied by your operator.
+The Python SDK is asynchronous: use `await client.messages.create(...)` inside
+an async function and an `async with Client(...)` context.
 
-- **In the workspace:** chat with any employee, assign work, review what ships.
-- **From your code:** Libra OS Cloud exposes the same OpenAI-compatible endpoints
-  and the same [`libraos` SDK](/creating-an-agent) as self-hosted — just point
-  them at your workspace URL with a workspace API key:
+Employees and agents are configured for your workload. Setup-generated
+definitions and templates are editable starters; there is no fixed eight-person
+team that applications should assume exists.
 
-```python
-from libraos import Client
+## Add your knowledge
 
-c = Client(base_url="https://your-workspace.libraos.com", api_key="msk_live_...")
-resp = c.messages.create(
-    agent_id="customer-support",
-    messages=[{"role": "user", "content": "Does the Pro plan support SSO?"}],
-)
-```
+Upload documents, create collections, and bind them to your agents using
+[Workspaces & memory](/workspaces-memory). A website crawler or other connector
+must be configured and available before it can import content. A Cloud
+invitation by itself does not connect your website or populate a knowledge base.
 
-Everything in [Building agents](/creating-an-agent) and the
-[Guides](/guides/customer-support) works identically on Cloud — the API surface
-is the same, only the base URL and key differ.
+## Move between deployments
 
-## 5. Write blogs and docs
+Export the employee and agent definitions and supported bundle contents,
+import them into the destination, then configure credentials, callbacks,
+models, and storage for that environment. Verify collection bindings and run
+your evaluation set. A bundle is not a backup of conversations, jobs, audit
+history, or every external service.
 
-Ask a content employee to draft a blog post, a help article, or a report. Because
-it is grounded in your connected website and knowledge base, drafts are
-source-cited and on-brand — ready for you to review and publish rather than
-starting from a blank page.
-
-## Growing up: Cloud plans and beyond
-
-The free tier is for evaluation. Cloud plans start at **$249/month** as you grow
-— see [pricing](https://libraos.com/pricing/). Every plan includes the complete
-platform; the firewall and governance layer are never gated behind a higher tier.
-
-## Moving to self-hosted later
-
-Compliance, data-residency, or scale requirements can arrive after you have
-already built something. Because Cloud and Self-Hosted are the **same Libra OS**,
-you export your employees, knowledge, and configuration and import them into a
-self-hosted deployment — no rebuild, no migration of agents. See
-[Cloud vs Self-Hosted](/editions).
-
-:::note Availability
-Libra OS Cloud is rolling out. If sign-up isn't yet open in your region, the same
-capabilities are available today on [Self-Hosted](/getting-started), and your
-work carries over when Cloud opens.
-:::
-
-## Next steps
-
-- **[Cloud vs Self-Hosted](/editions)** — which edition fits, and how to move between them
-- **[Create your first agent](/creating-an-agent)** — the SDK works the same on Cloud
-- **[Customer support agent](/guides/customer-support)** — a full grounded-assistant build
+See [portability](/portability) for environment-dependent features. Confirm
+current availability and commercial terms during onboarding rather than
+relying on a fixed price or free-tier allowance in an integration guide.

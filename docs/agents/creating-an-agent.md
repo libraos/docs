@@ -2,54 +2,32 @@
 slug: /creating-an-agent
 sidebar_position: 2
 title: Create your first agent
-description: Go from zero to a working agent on Libra OS in three SDK calls — create an employee, attach a skill agent, and talk to it.
+description: Create an executable agent with the Python SDK, send a message, and read the response.
 ---
 
 # Create your first agent
 
-An agent is an application that completes a task by planning its own steps and
-calling tools. On Libra OS, agents run inside **your** deployment — grounded in
-your documents, screened by the AI firewall, with nothing leaving your network.
-
-**What you'll do:**
-
-1. Set up a project with the Libra OS SDK
-2. Create a digital employee and attach an agent to it
-3. Send the agent its first message
-
-Total surface from nothing to a working agent: **three SDK calls**.
+This tutorial creates a standalone persona agent and sends it a message.
+An employee record is optional. Add one when several agents need shared
+configuration; see [Employees and agents in YAML](/employee-yaml).
 
 ## Prerequisites
 
-- A running Libra OS deployment — see [Getting started](/getting-started) to
-  install one locally (a laptop is fine for this tutorial)
-- **Python 3.10+**
-- A Libra OS API key (`msk_...`)
-
-## Setup
-
-**1. Install the SDK:**
+- A running server with working model settings: [Getting started](/getting-started).
+- Python 3.10 or newer and `pip install libraos-sdk`.
+- A credential authorized to create and invoke agents. The SDK's `api_key`
+  parameter accepts the bearer token issued by your deployment.
 
 ```bash
-pip install libraos-sdk
+export LIBRA_OS_URL=http://localhost:8900
+export LIBRA_OS_API_KEY='your-bearer-token'
 ```
 
-The SDK source, OpenAPI spec, and worked examples live at
-[github.com/libraos/sdk](https://github.com/libraos/sdk).
+The SDK source and examples are in [libraos/sdk](https://github.com/libraos/sdk).
 
-**2. Point it at your deployment:**
+## Create and call
 
-```bash
-export LIBRA_OS_URL=https://libraos.your-company.example   # or http://localhost:8900
-export LIBRA_OS_API_KEY=msk_live_...
-```
-
-(The legacy `NOVA_OS_*` names still work — the server bridges them — but
-`LIBRA_OS_*` is canonical.)
-
-## Build the agent
-
-Create `first_agent.py`:
+Save as `first_agent.py`:
 
 ```python
 import asyncio
@@ -59,118 +37,93 @@ from libraos import Client
 
 
 async def main() -> None:
-    base_url = os.environ["LIBRA_OS_URL"]
-    api_key = os.environ["LIBRA_OS_API_KEY"]
-
-    async with Client(base_url=base_url, api_key=api_key) as c:
-        # 1. Create the employee — the identity that owns one or more agents.
-        #    model_config picks the model per routing tier, with fallbacks.
-        await c.employees.create(
-            id="my-first-employee",
-            display_name="My First Employee",
-            model_config={
-                "answer": {
-                    "primary": "anthropic/claude-opus-4-7",
-                    "fallback": ["gemini/gemini-2.5-flash"],
-                }
-            },
+    async with Client(
+        base_url=os.environ["LIBRA_OS_URL"],
+        api_key=os.environ["LIBRA_OS_API_KEY"],
+    ) as client:
+        agent = await client.agents.create(
+            name="my-first-agent",
+            agent_type="persona",
+            system="You are a helpful assistant. Answer concisely.",
         )
-
-        # 2. Create the agent — the runnable behavior bound to that employee.
-        #    "type" tells the registry what loop to run:
-        #    skill = single-call, persona = multi-turn.
-        await c.agents.create(
-            id="my-first-agent",
-            type="skill",
-            owner_employee="my-first-employee",
-            instructions="You are a helpful assistant. Answer concisely.",
-        )
-
-        # 3. Talk to it. No session object needed — memory is keyed on the
-        #    (API key, end user, agent) triple automatically.
-        resp = await c.messages.create(
-            agent_id="my-first-agent",
+        agent_id = agent["id"]
+        response = await client.messages.create(
+            agent_id=agent_id,
             messages=[{"role": "user", "content": "What are you good at?"}],
         )
-        print(resp)
+        print(response.text)
 
 
 asyncio.run(main())
 ```
 
-This code has three parts:
-
-1. **`employees.create`** — the employee is the durable identity: display
-   name, model configuration, and (as it grows) the knowledge and memory that
-   accumulate around it. One employee can own several agents.
-2. **`agents.create`** — the agent is the runnable behavior. A `skill` agent
-   handles a single delegated call; a `persona` agent holds a multi-turn
-   conversation. `instructions` is the agent's system prompt.
-3. **`messages.create`** — sends work to the agent. There is no session or
-   environment object to manage: send another `messages.create()` at any time,
-   and pass the `X-End-User` header to scope memory per end user (omit it for
-   a single shared scope, which is fine while evaluating).
-
-### Run it
-
 ```bash
 python first_agent.py
 ```
 
-The agent answers through the model tiers you configured, and the response —
-like every Libra OS answer — passes the AI firewall on the way in and out.
-This script is
-[`00_quickstart.py`](https://github.com/libraos/sdk/blob/main/python/examples/00_quickstart.py)
-in the SDK repo, which also shows the optional cleanup calls
-(`agents.delete` / `employees.delete`) for idempotent dev loops.
+The first call creates the definition; the second invokes it. The model is
+omitted so the agent uses your server's configured default. No documents or
+tools are attached yet, so this is a basic model answer, not a knowledge-grounded
+answer. Exact wording varies by model.
 
-## Customize your agent
+Save the returned agent ID in your application. On subsequent runs, call that
+ID without creating it again; creating the same name again can return a conflict.
 
-**Give it tools.** Add `filesystem.enabled: true` to the agent's frontmatter
-and six filesystem tools register automatically — no container plumbing.
-Register your own tools with `custom_tools`: Mode A delivers tool calls inline
-over SSE; Mode B calls a webhook you host.
+The prompt field for this API is **`system`**. The SDK also accepts
+`system_prompt` as an alias. `instructions` is not the supported field.
 
-**Control the models.** `model_config` works per tier (answer / skill / brain /
-memory worker) with fallback chains, and cascades per-call → per-skill →
-per-agent → per-employee → server default. If your deployment runs on a token
-plan, use the covered model ids — see
-[Model settings](/model-settings).
+## Continue the conversation
 
-**Enforce output shape.** Set `output_type` to a JSON Schema and choose what
-happens on violation: `error`, `log`, or `repair`.
+For a client-managed conversation, retain the messages and append both sides:
 
-**Search the web.** `web_search_config` selects the search backend, fallback
-chain, and recency-intent escalation.
+```python
+history = [{"role": "user", "content": "My project is called Atlas."}]
+response = await client.messages.create(agent_id=agent_id, messages=history)
+history.append({"role": "assistant", "content": response.text})
+history.append({"role": "user", "content": "What is my project called?"})
+response = await client.messages.create(agent_id=agent_id, messages=history)
+```
 
-**Ship it to another deployment.** Employees are portable — export the bundle
-(agents, prompts, config) and import it elsewhere.
+This fragment runs inside the async client context above. Reusing an agent ID
+alone does not resend previous turns. For server-stored threads and longer-lived
+facts, see [Managing memory](/managing-memory).
 
-Worked end-to-end integrations — legaltech, healthcare, finance — are in the
-SDK repo's [`examples/`](https://github.com/libraos/sdk/tree/main/examples)
-directory.
+`response["content"]` is an array of content blocks. `response.text` joins text
+blocks for display; preserve the full response when your application needs
+tool blocks or metadata. [Calling agents](/calling-agents) compares the wire formats.
+
+## Add an employee when you need shared defaults
+
+Use `data/employees/frontdesk.md` for the employee and set
+`owner_employee: frontdesk` in an agent's Markdown frontmatter. The
+[YAML guide](/employee-yaml) shows both files and the call that runs the agent.
+
+The current managed-agent create/update handler supports a subset of the file
+schema. In particular, do not assume that passing `owner_employee`,
+`model_config`, or `callback` through `agents.create(**fields)` applies those
+settings: the inspected handler does not persist them. Use the file-based path
+for those fields and check your installed release's API contract.
+
+## Add knowledge and tools
+
+- Bind a [knowledge collection](/workspaces-memory) to retrieve from your documents.
+- Configure [custom tools](/employee-yaml#skills-and-tools) to call your application.
+- Enable [web search](/web-search) when the deployment has a search backend.
+- Use [background tasks](/durable-runs) when a request should outlive its connection.
+
+The [customer support guide](/guides/customer-support) combines these pieces.
 
 ## Already building agents with Anthropic's tooling?
 
-Your existing code runs against Libra OS without a rewrite:
+The Messages-compatible endpoint accepts requests at `/v1/messages`.
+Select the registered agent with `metadata.agent_id`; the `model` field has
+a separate role. See the exact request in [Calling agents](/calling-agents).
 
-- **Anthropic Messages SDK** — `anthropic.Anthropic(base_url=<your Libra OS>)`.
-  The Messages API and the Managed Agents beta endpoints (`/v1/agents`,
-  `/v1/sessions`) work unchanged. See the
-  [compat reference](https://github.com/libraos/sdk/blob/main/docs/anthropic-compat.md).
-- **[Claude Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview)** —
-  the SDK's bundled CLI inherits its environment, so
-  `ClaudeAgentOptions(env={"ANTHROPIC_BASE_URL": <your Libra OS>, "ANTHROPIC_API_KEY": "msk_..."})`
-  redirects the whole local agent loop (Read/Bash/Edit tools included) to your
-  own runtime. See
-  [`01b_claude_agent_sdk_drop_in.py`](https://github.com/libraos/sdk/blob/main/python/examples/01b_claude_agent_sdk_drop_in.py).
+The SDK also exposes managed-agent APIs. Direct HTTP callers need the
+`anthropic-beta: managed-agents-2026-04-01` header on `/v1/agents`; the Libra OS
+SDK supplies it automatically. Compatibility is limited to the fields and
+behaviors implemented by your server release.
 
-Use those to get running in an afternoon; graduate to the native surface above
-when you want model tiers, output contracts, and custom tools.
-
-## Next steps
-
-- **[Defining employees in YAML](/employee-yaml)** — the declarative file format behind these SDK calls
-- **[Model settings](/model-settings)** — routing tiers, billing, covered and local models
-- **[Core capabilities](/capabilities)** — the kernel, firewall, and knowledge base your agent runs on
-- **[SDK examples](https://github.com/libraos/sdk/tree/main/python/examples)** — every pattern above as a runnable script
+For integrations, see the SDK's
+[compatibility reference](https://github.com/libraos/sdk/blob/main/docs/anthropic-compat.md)
+and [examples](https://github.com/libraos/sdk/tree/main/python/examples).

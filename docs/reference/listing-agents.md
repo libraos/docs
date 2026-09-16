@@ -2,7 +2,7 @@
 slug: /listing-agents
 sidebar_position: 5
 title: Listing agents
-description: Two endpoints return agents and they answer different questions. Which one to call, and how to tell a tenant's own agents from the bundled presets.
+description: Choose the managed-agent API or operator registry, distinguish definition sources, and inspect available agents.
 ---
 
 # Listing agents
@@ -14,19 +14,23 @@ the difference is not obvious from the names.
 | | `GET /v1/agents` | `GET /api/agents` |
 | --- | --- | --- |
 | purpose | managed agents, for applications | the loaded registry, for operators |
-| auth | your API key | **admin only** |
-| tells you which agents are yours | no `source` field | **yes** — `source: custom \| preset` |
+| auth | authorized credential + managed-agent beta header | **admin only** |
+| distinguishes definition source | no `source` field | `source: custom \| preset` (not ownership) |
 | tells you what an agent runs on | `model` | `model`, `model_override`, `model_source` |
 
 If you are **building an application**, use `/v1/agents`.
 If you are **building an admin page over the registry**, use `/api/agents`.
+For direct HTTP calls to the former, include
+`anthropic-beta: managed-agents-2026-04-01`; the Python SDK adds it.
+Neither response lists employee identity records. See [Calling agents](/calling-agents)
+to invoke an ID you discover.
 
 ## The mistake worth avoiding
 
-A stock deployment ships **more bundled presets than a tenant has agents of its
-own**. An admin page that renders `GET /api/agents` unfiltered shows
-`skill_docx`, `bi-assistant` and `nova-orchestrator` alongside the tenant's
-work, as though the tenant created them.
+Depending on release and configuration, the registry can include bundled
+agents, tool agents, setup-generated agents, and definitions created by API.
+Do not hardcode their names or assume a fixed number of employees. An unfiltered
+operator list can mix built-in behavior with application-created agents.
 
 Filter server-side:
 
@@ -37,6 +41,11 @@ curl -H "Authorization: Bearer $ADMIN_TOKEN" \
 
 `source` accepts `custom` or `preset`. Omit it to get both.
 
+This is a **definition-location** classification: runtime-directory entries are
+`custom`; definitions outside it are classified as `preset`. A hand-authored
+file can therefore report `preset`. The filter does not establish who owns an
+agent, which tenant it belongs to, or what a caller is allowed to invoke.
+
 **An unrecognised value is rejected, not ignored.** `?source=everything`
 returns `400 invalid_source` rather than quietly returning every agent —
 a filter that silently widens its result set is how a preset ends up on a
@@ -46,7 +55,7 @@ tenant's page.
 
 ```json
 {
-  "agents": [ ... ],
+  "agents": [],
   "warnings": ["ignored unknown query parameter \"owner\""]
 }
 ```
@@ -82,8 +91,10 @@ A preset therefore looks like this:
 }
 ```
 
-Read `model` when you want to show what an agent runs on. Read
-`model_override` only when you specifically care whether it was pinned.
+Read `model` for the registry's reported model and `model_override` for the
+explicit legacy pin. This summary is not a trace of all resolved model slots:
+an employee's `model_config`, a planner/skill tier, or a per-call override can
+require inspecting the definition and execution record.
 
 ### When the model is absent
 
@@ -110,8 +121,9 @@ unknown rather than substituting a default of your own.
 
 ## Full schema
 
-Both endpoints are in the published OpenAPI contract
-([`libra-os-partner.v1.yaml`](https://github.com/libraos/sdk/blob/main/openapi/libra-os-partner.v1.yaml)),
-under `listRegistryAgents` and the `RegistryAgent` schema. That is the
+The published OpenAPI contract
+([`libra-os-partner.v1.yaml`](https://github.com/libraos/sdk/blob/main/openapi/libra-os-partner.v1.yaml))
+describes the APIs. `listRegistryAgents` and `RegistryAgent` describe the
+operator registry, not the managed-agent response. That is the
 authority for field-level detail; this page covers which endpoint to call and
 why.

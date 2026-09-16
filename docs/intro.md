@@ -2,98 +2,73 @@
 slug: /
 sidebar_position: 1
 title: Introduction
-description: What Libra OS is, why it exists, and how the documentation is organized.
+description: Build applications on Libra OS — understand the runtime, create an agent, connect knowledge and tools, and operate your deployment.
 ---
 
-# Libra OS
+# Build on Libra OS
 
-**The Operating System for the AI Workforce** — one sovereign AI layer over everything your
-company knows.
+Your knowledge. Your infrastructure. Your digital workforce.
 
-One 59MB binary. Install it inside your own infrastructure and eight supervised
-AI employees start working — grounded in your documents, screened by an AI
-firewall, and never sending your data anywhere.
+Libra OS is a runtime for applications that use agents, enterprise knowledge,
+and tools. Your application supplies the user experience and business logic;
+Libra OS runs agents and provides model routing, retrieval, persistence, and
+governance features.
 
-## Why Libra OS exists
+You can use the Python SDK, native HTTP APIs, or compatible model APIs.
+[Libra Desk](/desk) is one application built on this runtime; you can build
+your own without adopting Desk's interface or workflow.
 
-Every company wants AI on its own work. Almost none can hand its documents to a
-managed cloud service.
+## Start with a working agent
 
-Legal work is privileged. Insurance files carry PII. Student records are
-FERPA-protected. And AI that answers differently every time, with no citation
-and no audit trail, isn't usable in a regulated workflow — no matter how capable
-the model is.
+1. **Run the server:** [Getting started](/getting-started) covers installation,
+   a database, model configuration, authentication, and a first request.
+   [Cloud](/cloud) is available through private-beta onboarding.
+2. **Create an agent:** [Create your first agent](/creating-an-agent) shows a
+   complete Python example with a prompt and a response you can print.
+3. **Choose an interface:** [Calling agents](/calling-agents) maps each endpoint
+   to its agent selector, request shape, and response format.
+4. **Add context and actions:** bind [knowledge collections](/workspaces-memory),
+   configure [tools](/employee-yaml#skills-and-tools), and choose the
+   [memory](/managing-memory) your application needs.
+5. **Operate it:** inspect [available agents](/listing-agents), run
+   [background tasks](/durable-runs), and check [deployment](/deployment)
+   and [portability](/portability) requirements.
 
-The alternatives all ask something unreasonable. Cloud assistants want your
-data. Agent frameworks want your engineering team. Governance platforms want you
-to have already built the agents. Libra OS asks for one thing: a machine to
-install on.
+## Understand the objects
 
-## What you get on day one
+| Object | Developer responsibility |
+| --- | --- |
+| **Application** | Calls the runtime, authenticates users, and presents results or review decisions. |
+| **Employee** | An optional identity record that groups agents and supplies shared configuration. It does not execute a prompt. |
+| **Agent** | The executable behavior: instructions, tools, model settings, and knowledge bindings. Applications invoke an agent by ID. |
+| **Skill / tool** | A delegated behavior or callable operation available to an agent. See [the distinction](/agents#core-concepts). |
+| **Knowledge collection / Pack** | Documents available for retrieval, or a distributable package of knowledge and configuration. Bind the installed collections to agents. |
 
-### Eight supervised digital employees
+One employee can own several agents through their `owner_employee` field.
+An agent can also run independently. Creating an employee does not create an
+agent, choose a default agent, or make all its agents share conversation memory.
+See [Employees and agents in YAML](/employee-yaml) for a complete linked example.
 
-Pre-installed and ready to work — document analysis, contract review, intake,
-email triage, compliance review, and more. No agent-building project, no prompt
-library to assemble, no platform team required.
+Setup-generated agents and optional templates are starting points you can edit.
+The tutorials create their own agents and do not depend on a fixed set of
+pre-installed employees; bundled agents vary by release and deployment.
 
-### An AI firewall on every answer
+## Know where processing happens
 
-Source grounding, PII redaction, and prompt-injection screening run on every
-request, in every tier. Answers cite where they came from. Nothing is a black
-box.
+Self-hosting controls where the runtime and its stores run. Hosted models,
+embedding services, web search, and tool callbacks can still receive data.
+For an offline deployment, configure local models and embeddings and check
+each tool's dependencies. [Security](/security) explains the boundaries;
+[portability](/portability) explains which capabilities depend on the environment.
 
-### Supervision built into the daily workflow
+## Worked integrations
 
-Approval queues put a human in the loop where it matters. An instant hard-stop
-freezes any agent mid-task. Nothing ships without review — and the review trail
-becomes your compliance record.
+- [Customer support](/guides/customer-support): ground answers in product docs,
+  connect order and ticket tools, and handle escalation.
+- [Ticket routing](/guides/ticket-routing): classify tickets into structured
+  outputs and let your application select a queue.
+- [Libra Desk](/desk): see how a complete application combines agents,
+  connectors, approval queues, and an audit trail.
 
-### A knowledge base that stays yours
-
-Graph and vector hybrid search over your own documents. Indexes, agent memory,
-and audit history accumulate inside your deployment and never leave it.
-
-## What makes Libra OS different
-
-Most tools in this space either govern agents you still have to build, or hand
-you source code you still have to run. Libra OS is the runtime itself — it
-arrives with the employees already in it, and it works with the network cable
-unplugged.
-
-## In production
-
-- **Exabits** — an AI data center running its own GPU fleet: internal legal and
-  business decisions on their own hardware.
-- **EqualDocs** — legal AI across 120+ jurisdictions; the first production
-  `libra-os-sdk` deployment.
-- **Bona Sonority School, Nanjing** — supervised AI employees in education,
-  from document work to voice and video.
-
-See the case section on [libraos.com](https://libraos.com/) for the full
-stories.
-
-## How it's priced
-
-Cloud plans start at **$249/month** — self-serve, the full platform, no feature
-gating. Enterprise licenses are per node on an annual term. Every tier includes
-the complete platform: the firewall and the governance layer are never an
-upsell. Details at [libraos.com/pricing](https://libraos.com/pricing/).
-
-## Where to start
-
-- **[Libra OS Cloud](/cloud)** — hosted, sign-up-and-go: start free in minutes, no install.
-- **[Cloud vs Self-Hosted](/editions)** — the two editions, and how to move between them.
-- **[Getting started (self-hosted)](/getting-started)** — download, install, and run your first query.
-- **[Deployment](/deployment)** — managed cloud, your cloud, or air-gapped on-prem.
-- **[Security](/security)** — the AI firewall, source-cited answers, and the offline license.
-- **[Model settings](/model-settings)** — routing tiers on any OpenAI-compatible endpoint: pay-as-you-go, token plans, or fully local.
-- **[Create your first agent](/creating-an-agent)** — a working agent in three SDK calls: employee, skill agent, first message.
-- **[Defining employees in YAML](/employee-yaml)** — advanced: the declarative file format for employees and agents.
-- **[Customer support agent](/guides/customer-support)** — the most common deployment, from template to production.
-- **[Core capabilities](/capabilities)** — the kernel, model routing, packs, and the SDK.
-- **[Benchmarks](/benchmarks)** — measured, not marketed: same-model A/B results.
-
-This site is the user guide and reference for running Libra OS. It is
-developer-editable: the content lives in Markdown, and updates publish through a
-normal pull-request workflow.
+These docs describe interfaces and configuration. Check the capabilities of
+your installed server and SDK versions before relying on a recently added field.

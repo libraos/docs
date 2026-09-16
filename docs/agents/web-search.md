@@ -1,6 +1,6 @@
 ---
 slug: /web-search
-sidebar_position: 5
+sidebar_position: 6
 title: Web search
 description: Give an agent the live web — the four tools, what a result actually is, how to bound the spend, and how to tell a page that was read from a page that was only found.
 ---
@@ -18,8 +18,9 @@ the point.
 
 ## Turn it on
 
-Web access is a capability an agent declares. Nothing reaches the internet
-unless an agent is given a tool that does.
+Web tools are capabilities an agent declares. Hosted model calls, embeddings,
+and callbacks have separate network paths; disabling web tools does not make
+the whole deployment offline.
 
 ```yaml
 capabilities:
@@ -36,16 +37,14 @@ page.
 
 ## Configuration
 
-There is nothing to configure.
+When model and search traffic use the **same MegaNova gateway host**, search
+can reuse `OPENAI_API_KEY` from `OPENAI_API_BASE`. No second copy of that key is
+required. This reuse is host-checked: an unrelated provider key is not forwarded
+to the search service.
 
-Search and page-fetch run on the **same gateway as your model tiers**, so they
-reuse the credential you already set for chat. If `OPENAI_API_KEY` and
-`OPENAI_API_BASE` are working, web search works.
-
-That is deliberate. It used to take a second variable naming the same
-credential for the same host — and a deployment could have chat working
-perfectly while web search silently did nothing, because nobody knew the
-second variable existed.
+A working local model or another provider's chat API does not establish a
+search backend. Configure a supported search service and verify an actual
+search result; otherwise web tools report that no backend is available.
 
 **Bringing your own provider.** Set your own search keys and they are used
 instead, as a fallback chain behind the gateway; with no gateway configured
@@ -66,8 +65,9 @@ two fields before you trust a quote.
 | `provider_summary` | The provider's generated prose *about* the page |
 | `model_answer` | A model's answer to your query — not a source at all |
 
-The first three are page-derived: they are words that appear on the page. The
-last two are model-generated. A `provider_summary` can be accurate and still
+The first three are classified as page-derived, but a search snippet is not
+proof of a verbatim passage in the current page. Open and verify the source
+before quoting it. The last two are model-generated. A `provider_summary` can be accurate and still
 be the wrong thing to quote, because nobody guarantees the page says it.
 
 | `status` | Meaning |
@@ -118,8 +118,8 @@ deployment.
 
 ## Reading the answer
 
-Every chat response carries a `grounding` verdict. For web work these are the
-ones to watch:
+Inspect the `grounding` verdict exposed by your endpoint and server version.
+For web work these are the outcomes to watch:
 
 | Verdict | What happened |
 | --- | --- |
@@ -152,16 +152,22 @@ content you cannot trust.
 
 ## A worked example
 
+Use an installed `research-assistant` agent with the capabilities above.
+Set `LIBRA_OS_URL` and `LIBRA_OS_API_KEY` as in the quickstart:
+
 ```bash
-curl -s -X POST $KERNEL/v1/messages \
-  -H "authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+curl --fail-with-body -sS "$LIBRA_OS_URL/v1/messages" \
+  -H "Authorization: Bearer $LIBRA_OS_API_KEY" -H 'Content-Type: application/json' \
   -d '{
     "model": "research-assistant",
     "max_tokens": 900,
-    "metadata": { "max_searches": 3, "research_query": "What changed in the 2026 filing deadline?" },
+    "metadata": { "agent_id": "research-assistant", "max_searches": 3, "research_query": "What changed in the 2026 filing deadline?" },
     "messages": [{"role": "user", "content": "What changed in the 2026 filing deadline? Cite sources."}]
   }'
 ```
+
+`metadata.agent_id` selects the agent on this endpoint; `model` alone does not.
+See [Calling agents](/calling-agents) for the other API shapes.
 
 Check three things in the response: `grounding` is `grounded`, at least one
 cited source has `status: opened`, and any text you plan to quote is

@@ -3,6 +3,6 @@
   "position": 2,
   "link": {
     "type": "generated-index",
-    "description": "Start on hosted Cloud or install Self-Hosted, then choose a deployment mode and configure your models."
+    "description": "Install Self-Hosted or request Cloud private-beta access, then configure your models and create an agent."
   }
 }
