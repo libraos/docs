@@ -35,6 +35,69 @@ Despite the source folder's name, these are not employee identity records.
 Create the destination directory first, review the tools it references, and
 reload after editing. Template availability does not imply pre-installed agents.
 
+## What is scoped to what
+
+Four things accumulate state, and they are scoped by four different keys.
+Knowing which is which is the difference between two agents sharing a memory
+on purpose and merging one by accident.
+
+```
+  USER WORKSPACE                     users/<user_id>/
+  ──────────────                     private files, path-rewritten, per human
+        │                            (never shared between users)
+        │
+        ├── EMPLOYEE ..............  data/employees/<id>.md
+        │   defaults only           model_config · web_search_config · callback
+        │   (config, not control)   + the house profile key (tenant, employee)
+        │        │
+        │        │ owner_employee:  agent inherits per slot, agent wins
+        │        ▼
+        ├── AGENT DEFINITION .....  data/agents/<id>.md
+        │   the YAML + prompt       system prompt, tools, knowledge_bindings
+        │        │
+        │        │ instantiated at boot, one long-lived object per definition
+        │        ▼
+        │   AGENT RUNTIME .........  what actually answers a turn
+        │   addressed as            /agents/v1/<agent-id>/chat
+        │
+        └── MEMORY ...............  (platform_user, end_user, memory_scope)
+            observational log,     defaults to the agent id — see below
+            facts, episodes
+```
+
+**The employee is a defaults profile, not a controller.** It supplies
+configuration down a cascade and keys the house profile. It is never invoked,
+never routes, and grants no permission: `owner_employee` does not authorize
+anything, and access control runs entirely through scopes, grants and
+collection ACLs. If you need an agent restricted, restrict it there.
+
+**Memory keys on `memory_scope`, which defaults to the agent id.** That default
+means an agent's accumulated memory is keyed on its *filename*, with two
+consequences worth knowing before you rely on it:
+
+- Renaming a definition orphans everything it remembered.
+- Two definitions cannot share a log, and one definition used in two contexts
+  merges memories that may belong apart.
+
+Set `memory_scope` on the agent to decouple the two:
+
+```yaml
+# Both agents observe the same person and share one log.
+name: triage
+memory_scope: frontdesk
+---
+name: specialist
+memory_scope: frontdesk
+```
+
+Leave it unset and nothing changes — the key stays the agent id. Personal-scope
+turns are always stored separately regardless, so personal and corporate logs
+never merge.
+
+**Workspace files are per user, not per agent or employee.** A workspace lives
+under `users/<user_id>/` and is private to that human; `filesystem.enabled` on
+an agent provisions access to the caller's workspace, not to one of its own.
+
 ## An employee file
 
 Save as `data/employees/frontdesk.md` (the first line must be `---`):
@@ -232,6 +295,7 @@ should dispatch on.
 | `max_output_tokens` | Per-agent output cap; overrides per-skill defaults so long deliverables (memos, reports) don't truncate |
 | `persona` | Structured persona block: `background`, `voice`, `traits` |
 | `hooks` | Per-agent lifecycle hooks |
+| `memory_scope` | Key the agent's observational memory is stored under. Defaults to the agent id, so memory follows the definition's *name* — renaming orphans it, and two definitions cannot share a log. Pin a value to survive renames, or give two agents the same value so they observe one person together. See [What is scoped to what](#what-is-scoped-to-what). |
 
 ### Visibility and UX
 
