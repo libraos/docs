@@ -13,7 +13,7 @@ them is not cosmetic — it is who the decision belongs to.
 | | **Settings** | **Admin** |
 |---|---|---|
 | Who opens it | every member | admins only |
-| What it changes | your own preferences and your own connections | organization policy, for everyone |
+| What it changes | your preferences and connection status | organization policy and shared connections |
 | Example | which language you read the app in | which services members may connect at all |
 
 The rule: **Settings never overrides Admin.** Where a personal setting is
@@ -38,7 +38,7 @@ rather than showing you a control that quietly does nothing.
   connections, automations, permissions and
   [autonomy level](/docs/desk/#autonomy-is-a-dial-not-a-switch); department
   templates that provision an agent with its approval group.
-- **People** — employees and groups: who reviews what, and which group
+- **People** — human employees and groups: who reviews what, and which group
   approves which queue.
 - **Connections & data** — org connectors, the website widget, corporate
   email, knowledge sources, imports from a system you are moving off, and the

@@ -7,33 +7,35 @@ description: One binary, three ways to run it — managed cloud, your cloud, or 
 
 # Deployment
 
-**One binary, three ways to run it.** The same Go runtime in all three modes —
-the demo is the product.
+Run the same runtime in a managed environment, your cloud, or on-premises.
+Plan the database, model services, storage, and credentials alongside the binary.
 
 ## Deployment modes
 
 | Mode | What it means | Best for |
 | --- | --- | --- |
-| **Managed cloud** | Runs on our inference cloud, subscription pricing | Getting started fast, smaller teams |
-| **Your cloud** | Your own tenant, your data boundary | Firms with a cloud footprint and compliance requirements |
+| **Managed cloud** | Managed environment; [private-beta access](/cloud) | Getting started fast, smaller teams |
+| **Your cloud** | Your infrastructure and configured data boundary | Firms with a cloud footprint and compliance requirements |
 | **Air-gapped on-prem** | Your hardware, offline license, no phone-home | Work that cannot leave the building |
 
 In the self-hosted modes there is no per-seat cloud dependency and no phone-home
 — the license is validated offline. On-premise deployments can also run
 networked behind your firewall if full air-gapping isn't required.
 
-**Deployment reality:** one engineering day from install to first governed
-workflow. 59MB, no dependency stack, no Kubernetes project.
+The binary size varies by release. A working deployment also needs a database,
+model endpoint, and any storage or tool backends required by the application.
+The [quickstart](/getting-started) covers the minimum configuration.
 
-**No telemetry, by design.** In air-gapped mode there is nothing calling home.
-Not a setting you toggle — an architectural property.
+Air-gapped operation requires local generation and embeddings plus tools that
+work inside that boundary. Verify [effective capabilities](/portability) and
+[data flow](/security) before disconnecting the deployment.
 
 ## What ships in the binary
 
 - The kernel and knowledge base
 - The AI firewall (three-tier screening)
-- Eight supervised digital employees
-- An OpenAI-compatible endpoint fronting 100+ models with failover
+- The agent runtime; create definitions through APIs, files, or available setup tooling
+- Compatible API endpoints that call models served by your configured gateway
 
 ## Secrets & environment
 

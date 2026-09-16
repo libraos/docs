@@ -9,8 +9,9 @@ description: Production guide — classify and route inbound tickets at scale wi
 Classify inbound support tickets by intent, urgency, and required expertise —
 and route them to the right team — using the
 [`email-classifier`](https://github.com/libraos/sdk/blob/main/employees/communications/email-classifier.md)
-template. Routing runs inside your deployment, so ticket contents (and the
-customer data inside them) never leave your network.
+template. Routing runs inside your deployment; ticket contents can still go to
+the configured model endpoint. For local-only processing, configure local models
+and dependencies as described in [Security](/security).
 
 ## Prerequisites
 
@@ -57,9 +58,8 @@ classifier's instructions and examples will be.
   customers write in.
 
 And the Libra OS-specific reason: tickets contain names, account details, and
-sometimes regulated data — here classification runs on your hardware with the
-firewall screening every request, instead of shipping every ticket to a
-vendor cloud.
+sometimes regulated data. Libra OS lets you choose local model processing and
+configure screening and authorization around the classification workflow.
 
 ### Define your intent taxonomy
 
@@ -105,6 +105,9 @@ enough?" is a measurement, not a debate. Classifier-specific criteria:
 | Explainability | Human rating of the reasoning field, 1–5 | ≥ 4 |
 | Bias audit | Accuracy variance across customer demographics | within 2–3% |
 
+The numbers above are illustrative targets to agree with your team, not
+platform guarantees or measured benchmark results.
+
 System-level criteria that matter regardless of method: time-to-assignment
 (near-instant with push integration), rerouting rate (< 10%; best-in-class
 ≤ 5%), escalation rate (< 20%), first-contact resolution (70–75%+), and cost
@@ -129,9 +132,13 @@ planning above calls for:
 
 ```bash
 git clone https://github.com/libraos/sdk
+mkdir -p ./data/agents
 cp sdk/employees/communications/email-classifier.md ./data/agents/
 # edit the taxonomy table and few-shot examples in the body
 ```
+
+This template defines an **agent**, despite the source directory's name.
+Reload after editing; see [Employee YAML](/employee-yaml#loading-and-reloading).
 
 ## Step 1 — Make the output a contract, not a convention
 
@@ -148,7 +155,7 @@ output_type:
                                          order, feedback, security, compliance,
                                          emergency, escalation] }
       priority:   { type: string, enum: [critical, high, medium, low] }
-      confidence: { type: number }
+      confidence: { type: number, minimum: 0, maximum: 1 }
       reasoning:  { type: string }
       language:   { type: string }
       entities:
@@ -157,15 +164,15 @@ output_type:
           order_id:    { type: string }
           account_ref: { type: string }
           amount:      { type: string }
-    required: [intent, priority, confidence, reasoning]
+    required: [intent, priority, confidence, reasoning, language]
     additionalProperties: false
   on_violation: repair
 ```
 
-Your routing service consumes validated JSON every time — `repair` mode fixes
-malformed output instead of crashing the pipeline, `reasoning` is always
-present for the audit trail, and the modifier fields (`priority`,
-`language`, `entities`) carry the routing criteria that aren't intent.
+`repair` mode attempts to correct invalid output; repair can fail. Treat an
+API error or invalid result as a failed classification and send it to review.
+Validate before acting, and retain the reasoning and input needed to audit the
+routing decision.
 
 ## Step 2 — Pick the model for volume
 
@@ -200,7 +207,7 @@ async def classify_ticket(c: Client, ticket_text: str) -> dict:
         agent_id="email-classifier",
         messages=[{"role": "user", "content": ticket_text}],
     )
-    return json.loads(resp["content"])   # schema-validated by output_type
+    return json.loads(resp.text)   # content is an array; text joins text blocks
 
 async def route(ticket: dict) -> None:
     async with Client(
@@ -208,11 +215,18 @@ async def route(ticket: dict) -> None:
         api_key=os.environ["LIBRA_OS_API_KEY"],
     ) as c:
         result = await classify_ticket(c, ticket["text"])
-        assign_queue(ticket["id"], result["intent"], result["priority"])
-        add_internal_note(ticket["id"], result["reasoning"])   # audit trail
+        add_internal_note(ticket["id"], result["reasoning"])
         if result["intent"] == "escalation" or result["confidence"] < 0.6:
             escalate_to_human(ticket["id"], result)
+            return
+        assign_queue(ticket["id"], result["intent"], result["priority"])
 ```
+
+`assign_queue`, `add_internal_note`, and `escalate_to_human` are application
+adapters you implement for your ticketing system, not SDK methods. Handle API,
+validation, and JSON-parsing failures by leaving the ticket unassigned or
+routing it to review. Persist a decision ID to avoid repeating side effects
+when a webhook is retried.
 
 Note the confidence gate: low-confidence classifications go to a human
 *with the reasoning attached*, instead of being force-fitted into a bucket —
@@ -235,9 +249,10 @@ To let the agent *act* on the ticket system itself (assign, tag, draft a
 reply), declare those operations as `custom_tools` with a webhook callback
 and side-effect declarations — the same pattern as the
 [customer support guide, Step 4](/guides/customer-support#step-4--connect-your-systems-with-tools).
-Route `escalation`-classified tickets to an
-[`approval_group`](/employee-yaml#visibility-and-ux) so they land in a human
-queue with the classifier's reasoning attached.
+Your application must route `escalation` results into its human queue.
+For agent-proposed side-effecting actions, configure an
+[`approval_group`](/employee-yaml#visibility-and-ux) and the relevant tool
+policy. A category string or group field alone does not file an action.
 
 ## Evaluate against your thresholds
 

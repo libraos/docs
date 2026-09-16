@@ -1,133 +1,77 @@
 ---
 slug: /agents
 sidebar_position: 1
-title: Agents overview
-description: The Libra OS agent runtime — employees, agents, skills, and the planner; what the runtime does for you and when to use it over a raw model call.
+title: Employees, agents, and tools
+description: Understand what an employee owns, what an agent executes, and how applications invoke and compose them.
 ---
 
-# Agents on Libra OS
+# Employees, agents, and tools
 
-A pre-built, supervised agent runtime that runs inside **your** deployment.
-Best for grounded, auditable work over your own documents.
-
-There are two ways to build with Libra OS, each suited to different use cases:
-
-|                | Compatible APIs | Agent runtime |
-| -------------- | --------------- | ------------- |
-| **What it is** | Your existing agent code, pointed at your deployment | Pre-built agent harness: employees, agents, skills, and the planner |
-| **Best for**   | Getting running in an afternoon with tooling you already use | Multi-turn digital employees with memory, grounding, and supervision |
-| **Learn more** | [Anthropic-compat section](/creating-an-agent#already-building-agents-with-anthropics-tooling) of the tutorial | This page, then [Create your first agent](/creating-an-agent) |
-
-The agent runtime provides the harness for running models as autonomous,
-supervised agents. Instead of building your own agent loop, tool execution,
-memory store, and review workflow, you define an employee and an agent — two
-records — and the runtime handles planning, skill delegation, model routing
-with fallbacks, per-user memory, and the AI firewall on every request in and
-out. Nothing leaves your network.
-
-:::note
-
-The runtime is identical on **Libra OS Cloud** and **Self-Hosted** — same
-binary, same APIs, no migration between them. See
-[Cloud vs Self-Hosted](/editions).
-
-:::
-
-**Start here:**
-
-- **[Create your first agent](/creating-an-agent)** — a working agent in three SDK calls
-- **[Defining employees in YAML](/employee-yaml)** — the declarative file format and full field reference
-- **[Customer support agent](/guides/customer-support)** — the most common deployment, from template to production
+An **agent** executes work. An **employee** is an optional identity and shared
+configuration record that owns agents. Your application sends work to an agent
+ID; the employee record does not run an agent-selection or planning loop.
 
 ## Core concepts
 
-The agent runtime is built around five concepts:
+| Concept | Purpose | Example |
+| --- | --- | --- |
+| **Employee** | Groups agents and supplies model, web-search, and callback defaults. | `frontdesk` owns intake and follow-up agents. |
+| **Persona agent** | Runs a conversational agent loop using its instructions and available tools. | `intake` collects a customer's request. |
+| **Skill agent** | Handles a focused invocation or delegated task. | A document classifier returns a category. |
+| **Skill reference** | Configures a delegated skill or installed tool pack; the meaning depends on what that ID resolves to. | A research skill or a document tool pack. |
+| **Tool** | A callable operation with defined inputs. A custom tool can call your webhook. | `lookup_order(order_id)` reads your order system. |
+| **Planner** | When enabled with `brain: true`, decomposes a task and selects available skills. | Research a question, then draft a report. |
+| **Knowledge collection** | Stores documents an agent can retrieve. | Product documentation bound to `intake`. |
+| **Memory** | Stores conversation history, extracted facts, or structured values under their own scopes. | A thread ID or a customer's collected case number. |
 
-| Concept | Description |
-| --- | --- |
-| **Employee** | The durable identity — display name, model configuration, and the knowledge and memory that accumulate around it. One employee can own several agents |
-| **Agent** | A runnable behavior bound to an employee: `skill` handles a single delegated call, `persona` holds a multi-turn conversation. Its Markdown body is the system prompt |
-| **Skill** | A sub-agent an agent can delegate to — each runs with its own prompt and model slot, dispatched by the planner |
-| **Planner** | The decomposition tier. With `brain: true`, it breaks a task across the agent's skills and routes each piece to the model that fits |
-| **Memory** | Conversation state, keyed automatically on the (API key, end user, agent) triple — there is no session object to create or manage. The longer-lived layer — collections, workspaces, cross-session facts — is [Workspaces & memory](/workspaces-memory) |
+In product copy, a conversational persona may be called a “digital employee.”
+In YAML and APIs, distinguish that persona agent from the **employee record**.
+In Desk's People screens, “employee” refers to a **human member**.
 
-## How it works
+## How work reaches an agent
 
-1. **Create an employee.** Define the identity, `model_config` (per routing
-   tier, with fallback chains), and shared defaults its agents inherit — via
-   [SDK call](/creating-an-agent) or a
-   [declarative file](/employee-yaml) in `data/employees/`.
+```text
+Application → intake agent → available skills and tools → response
+                   ↑
+       defaults from employee frontdesk
+```
 
-2. **Create an agent.** Bind it to the employee, choose `skill` or `persona`,
-   write its instructions, and attach skills, tools, and knowledge bindings.
+1. Define an agent, optionally setting `owner_employee: frontdesk`.
+2. Call the agent by ID, for example `messages.create(agent_id="intake", ...)`.
+3. The runtime applies the agent's configuration and inherited defaults.
+4. The agent uses its available tools; an enabled planner can delegate work.
+5. Your application reads the response and any grounding, error, or approval
+   information exposed by that API.
 
-3. **Send a message.** `messages.create(agent_id=...)` — pass the
-   `X-End-User` header to scope memory per end user. No session or environment
-   object to manage; send another message any time and the agent picks up
-   where it left off.
+The ownership link does not automatically make sibling agents callable by one
+another. Configure skills explicitly or have your application route between
+agents. There is no employee-level `default_agent` selector in the current
+employee schema.
 
-4. **The runtime runs the loop.** The planner decomposes the task, skills and
-   tools execute, models resolve per slot through the fallback cascade, and
-   the AI firewall screens every request on the way in and out — source
-   grounding, PII redaction, prompt-injection screening. Answers cite where
-   they came from.
+## What inherits, and what does not
 
-5. **Supervise and steer.** High-risk tool calls route to
-   [approval groups](/employee-yaml#visibility-and-ux) before they execute; an
-   instant hard-stop freezes any agent mid-task; and the review trail becomes
-   your compliance record.
+Models resolve **per slot**: agent → employee → server default. An agent can
+override `answer` while inheriting `planner` and `skill`. Web-search defaults
+and custom-tool callbacks also have their own cascades; see
+[the YAML reference](/employee-yaml).
 
-## When to use the agent runtime
+The agent keeps its own prompt, tools, knowledge bindings, access settings,
+and execution limits. Employee ownership alone does not grant collection
+access or merge its agents' memories. A separately configured
+[house profile](/managing-memory#house-profile) can provide shared instructions.
 
-The agent runtime is best for workloads that need:
+## Choose your starting point
 
-- **Grounded answers:** retrieval over your own documents via
-  `knowledge_bindings`, with citations on every answer and a confidence gate
-  below which the planner is consulted before answering from thin evidence
-- **Multi-turn assistants:** persona agents with per-user memory that persists
-  across conversations without session bookkeeping
-- **Delegated pipelines:** a planner decomposing work across skills, each
-  routed to the model — frontier or local — that fits the step
-- **Structured output:** a JSON Schema contract on the agent's answers, with
-  `error`, `log`, or `repair` on violation
-- **Human review:** approval queues on risky actions, per-tool risk tiers,
-  and a hard-stop — supervision as part of the runtime, not an add-on
-- **Minimal infrastructure:** no agent loop, memory store, tool-execution
-  layer, or review UI to build
+- **A first executable agent:** use the [SDK tutorial](/creating-an-agent).
+  Start without an employee if you do not need shared configuration.
+- **Several agents with employee defaults:** use
+  [declarative Markdown files](/employee-yaml). File fields and managed API
+  fields are not interchangeable; that page explains the current boundary.
+- **An existing chat client:** use the compatible endpoint in
+  [Calling agents](/calling-agents).
+- **A longer task:** use the [native jobs API](/durable-runs) and retain its
+  job ID for progress and results.
 
-## Built-in tools
-
-Agents get access to a set of built-in tools, all opt-in per agent:
-
-- **Knowledge base lookup:** graph and vector hybrid search over the
-  collections the agent is bound to, citations included
-- **Filesystem:** set `filesystem.enabled: true` and six filesystem tools
-  register automatically against a provisioned workspace — no container
-  plumbing
-- **Web search:** backend, fallback chain, and recency-intent escalation via
-  `web_search_config`, cascading agent → employee → server default
-- **Custom tools:** partner-defined tools with JSON Schema inputs — delivered
-  inline over SSE or to a webhook you host, with per-tool risk tiers that
-  gate the approval path
-- **Skills:** any skill in the catalog, attached with one line of frontmatter
-
-See the [agent field reference](/employee-yaml#agent-field-reference) for the
-full list and configuration options.
-
-## State and data
-
-The runtime is stateful by design: memory, knowledge indexes, workspaces, and
-the audit trail persist across conversations — and all of it lives inside your
-deployment. On Self-Hosted, that means your own network, down to fully
-air-gapped; on Libra OS Cloud, a dedicated environment you can export from and
-[move to Self-Hosted](/editions) without migration. Either way, model traffic
-goes only to the providers you configure, and the review trail doubles as
-your compliance record.
-
-## Next steps
-
-- **[Create your first agent](/creating-an-agent)** — employee, agent, first message
-- **[Defining employees in YAML](/employee-yaml)** — every field, grouped by what it controls
-- **[Model settings](/model-settings)** — routing tiers, fallback chains, covered and local models
-- **[Core capabilities](/capabilities)** — the kernel, firewall, and knowledge base underneath
-- **[Security](/security)** — the AI firewall and the sovereignty story in depth
+Persona agents still need conversation context. Pass message history or use
+the thread mechanism supported by your endpoint. Long-term observational
+memory is separately enabled; see [Managing memory](/managing-memory).

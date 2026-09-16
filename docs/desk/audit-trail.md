@@ -9,9 +9,10 @@ description: >-
 
 # Audit trail
 
-Desk's promise is that nothing leaves the building because a model decided it
-should. The audit trail is how you prove that promise to someone who wasn't in
-the room — an auditor, a regulator, a client, or you in six months.
+Desk records governed outbound actions and the decisions that authorize them.
+This ledger is distinct from chat history, model call logs, and background-job
+status. A successful chat or job alone is not an execution receipt for an
+outbound action.
 
 This page answers the four questions every compliance review asks: what is
 recorded, who can read it, how long it is kept, and how it gets out.

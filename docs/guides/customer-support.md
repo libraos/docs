@@ -10,14 +10,14 @@ Build a support agent that answers product questions **from your own docs with
 citations**, stays on topic, takes real actions (order lookups, ticket
 creation) through your existing systems, and hands anything past its scope to
 a human — with the review trail becoming your compliance record. It runs
-inside your deployment, so customer conversations and the data inside them
-never leave your network.
+inside your deployment. Hosted models, embeddings, and callbacks can still
+receive customer data; use local services when your deployment must stay offline.
 
 ## Prerequisites
 
 - A running Libra OS deployment — see [Getting started](/getting-started)
 - **Python 3.10+** and the SDK: `pip install libraos-sdk`
-- A Libra OS API key:
+- A deployment credential authorized to create and invoke the agent:
 
 ```bash
 export LIBRA_OS_URL=https://libraos.your-company.example
@@ -44,8 +44,8 @@ And the indicators specific to choosing **Libra OS** as the substrate:
   account data, order history, sometimes regulated PII.
 - **Answers must be attributable** — every claim traces to a source document,
   so a support lead can verify what the agent told a customer.
-- **Actions need sign-off** — refunds, cancellations, and escalations go
-  through a human queue by construction, not by convention.
+- **Actions need sign-off** — configure side-effect declarations, policies,
+  approval groups, and an application path for escalation.
 
 ### Define your ideal interaction
 
@@ -93,7 +93,10 @@ Set targets with your support team before shipping. Task metrics:
 | Topic adherence | ≥ 95% |
 | Escalation accuracy (escalated when it should) | ≥ 95% |
 
-Business metrics: deflection rate (typically 70–80% target), CSAT ≥ 4/5,
+These are example evaluation targets, not measured Libra OS guarantees.
+Choose thresholds from your baseline and the cost of each error.
+
+Business metrics might include deflection rate, CSAT ≥ 4/5,
 average handle time below your human baseline, and sentiment maintained or
 improved across the conversation.
 
@@ -106,11 +109,11 @@ On Libra OS those are configuration:
 | You'd normally build | On Libra OS |
 | --- | --- |
 | System prompt engineering, brand voice | The persona template — a reviewed Markdown file you edit |
-| RAG pipeline (chunking, embedding, retrieval, citation) | Knowledge collections + `knowledge_bindings`; every answer cites its source |
+| RAG pipeline (chunking, embedding, retrieval, citation) | Collections + bindings; inspect retrieval evidence and handle insufficient sources |
 | Guardrails against prompt injection, PII leaks, off-topic drift | The 3-tier AI firewall screens every request and response |
 | Tool-use loop + API integration code | `custom_tools` with a webhook callback — no client-side loop |
 | Human-in-the-loop approval flow | `approval_group` + side-effect declarations on tools |
-| Per-customer conversation memory | Automatic — keyed on the (API key, end user, agent) triple |
+| Per-customer context | Send message history or a supported thread ID; configure identity and optional observational memory separately |
 | Chat UI | Any OpenAI-compatible chat client, pointed at the agent |
 | Evaluation harness | The SDK's synthetic-customer simulator |
 
@@ -118,6 +121,7 @@ On Libra OS those are configuration:
 
 ```bash
 git clone https://github.com/libraos/sdk
+mkdir -p ./data/agents
 cp sdk/employees/support/customer-support.md ./data/agents/
 ```
 
@@ -125,6 +129,10 @@ The template arrives as a multi-turn persona (`agent_type: persona`,
 `brain: true`) with the `support_qa`, `troubleshooting`,
 `ticket_summarization`, and `knowledge_base_lookup` capabilities and a
 complete support-specialist system prompt in the body.
+
+Despite the SDK folder name `employees/`, this file defines an **agent**.
+An employee identity is optional. After editing, reload the server's registry
+as described in [Employee YAML](/employee-yaml#loading-and-reloading).
 
 ## Step 2 — Write the persona
 
@@ -165,9 +173,9 @@ Include 4–5 example interactions covering the tricky cases: the product you
 *don't* offer, the implicit request, the escalation trigger. The examples do
 more for consistency than any instruction.
 
-Two guardrails you do **not** need to write: prompt-injection screening and
-PII redaction run in the firewall on every request and response, outside the
-prompt where a jailbreak can't negotiate with them.
+Prompt-injection screening and PII handling are runtime guardrails, configured
+outside the prompt. Test the active policy with your data; a prompt and a
+screening layer are not guarantees against every disclosure or incorrect answer.
 
 ## Step 3 — Ground it in your product docs
 
@@ -237,31 +245,33 @@ Your integration is a plain chat call — no tool loop, no RAG plumbing:
 import os
 from libraos import Client
 
-async def answer(customer_id: str, history: list[dict]) -> str:
+async def answer(user_token: str, history: list[dict]) -> str:
     async with Client(
         base_url=os.environ["LIBRA_OS_URL"],
-        api_key=os.environ["LIBRA_OS_API_KEY"],
+        api_key=user_token,  # the authenticated user's authorized deployment token
     ) as c:
         resp = await c.messages.create(
             agent_id="customer-support",
             messages=history,                    # [{"role": "user", "content": ...}, ...]
-            headers={"X-End-User": customer_id}, # per-customer memory scope
         )
-        return resp["content"]
+        return resp.text
 ```
 
-The `X-End-User` header scopes memory per customer — each gets an isolated
-history, and the agent remembers *their* prior tickets, with no session
-plumbing on your side.
+This function uses the customer's authorized deployment token and passes the
+history explicitly. Your application must obtain that token and keep each
+customer's history separate. The SDK's `messages.create` does not accept a
+`headers` argument. For a shared backend credential, implement and verify the
+operator-approved identity mapping described in [Managing memory](/managing-memory);
+long-term recall is not enabled by this example.
 
 **Or skip the custom front end entirely.** Every agent is exposed as an
 OpenAI-compatible model, so any chat client that speaks that protocol can
 front it — including streaming:
 
 ```bash
-curl -N $LIBRA_OS_URL/v1/chat/completions \
+curl --fail-with-body -N "$LIBRA_OS_URL/v1/chat/completions" \
   -H "Authorization: Bearer $LIBRA_OS_API_KEY" \
-  -H "X-End-User: cust_4812" \
+  -H 'Content-Type: application/json' \
   -d '{
     "model": "customer-support",
     "stream": true,
@@ -299,11 +309,11 @@ route_templates:
 approval_group: support-leads
 ```
 
-Binding the agent to an approval group means side-effecting tool calls (the
-`create_ticket` above), low-confidence answers, and anything the agent
-escalates land in that group's queue. This is the supervision bound the
-platform is built around: the agent closes the routine tickets; the judgment
-calls reach people — and the approval trail is auditable after the fact.
+Create the group and its reviewer membership before binding the agent.
+The binding identifies the group for the configured approval path. It does not
+by itself turn a low-confidence answer or an escalation sentence into a queue
+item. Your tool or application must file the relevant action, follow the
+decision, and confirm execution before telling the customer it completed.
 
 ## Step 8 — Evaluate before (and after) you ship
 

@@ -5,7 +5,7 @@ const {themes: prismThemes} = require('prism-react-renderer');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Libra OS',
-  tagline: 'The Operating System for the AI Workforce — one sovereign AI layer over everything your company knows',
+  tagline: 'Build secure enterprise Knowledge Packs and employee agents with Libra OS',
   favicon: 'img/favicon.png',
 
   // Public site lives under libraos.com/docs/ (Caddy serves the static build there).
@@ -16,10 +16,11 @@ const config = {
   organizationName: 'libraos',
   projectName: 'docs',
 
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'throw',
+  onBrokenAnchors: 'throw',
   markdown: {
     hooks: {
-      onBrokenMarkdownLinks: 'warn',
+      onBrokenMarkdownLinks: 'throw',
     },
   },
 
@@ -73,7 +74,7 @@ const config = {
         docsDir: 'docs',
         includeBlog: true,
         title: 'Libra OS',
-        description: 'The operating system for the AI workforce — one sovereign AI layer over everything your company knows. Runs on your own hardware, air-gapped if you want.',
+        description: 'Developer guides for the Libra OS runtime: agents, employee configuration, knowledge, tools, memory, and deployment.',
       },
     ],
   ],

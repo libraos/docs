@@ -2,50 +2,48 @@
 slug: /capabilities
 sidebar_position: 1
 title: Core capabilities
-description: The orchestration kernel, model routing, governance dashboard, Knowledge Packs, capability modules, and the SDK.
+description: Map application requirements to Libra OS runtime features and their configuration.
 ---
 
 # Core capabilities
 
-## Orchestration kernel
+Libra OS supplies the runtime services below. Your application decides which
+agents to call, what users may do, and how to present results and review work.
 
-Plans, routes, and validates hundreds of agent calls per task. Seven layers of
-agents, each routed to the model that fits the job — the reason a complex task
-costs a fraction of what a naive approach spends.
+| Application need | Runtime feature | Start here |
+| --- | --- | --- |
+| Execute a prompted behavior | Persona and skill agents | [Create an agent](/creating-an-agent) |
+| Reuse configuration across agents | Employee records and inheritance | [Employee YAML](/employee-yaml) |
+| Retrieve company knowledge | Collections, bindings, and Knowledge Packs | [Knowledge](/workspaces-memory) |
+| Call business systems | Custom tools, callbacks, and configured policies | [Tools](/employee-yaml#skills-and-tools) |
+| Route models by task | Answer, planner, and skill model slots | [Model settings](/model-settings) |
+| Retain context | Conversations, observations, persisted fields, house profiles | [Memory](/managing-memory) |
+| Run work beyond one connection | Native jobs, persisted progress, outcome inspection | [Background tasks](/durable-runs) |
+| Inspect installed agents | Managed-agent and operator registry APIs | [Listing agents](/listing-agents) |
+| Build a review workflow | Approval groups and action records | [Desk example](/desk) |
 
-## Multi-provider model routing
+## Knowledge Packs and skill packs
 
-100+ models, cloud or local, routed per query. Frontier models where they help,
-local models where sensitivity requires it. A provider changes terms or gets
-blocked? Switch. You are never locked to one vendor.
+A Knowledge Pack supplies knowledge and associated configuration. A collection
+is the indexed document resource an agent retrieves from. A skill/tool pack
+supplies callable capabilities. Installing one does not imply that every agent
+has access to it; configure bindings and tool availability.
 
-## Sensitivity routing
+## Models and data flow
 
-Only the brain agent handling your most sensitive material is *suggested* to
-stay local — the other layers are free to use whatever model suits the task. You
-choose where on the spectrum to sit, from fully cloud to fully air-gapped.
+Model IDs are served by your configured endpoint; they are not models bundled
+inside the Libra OS binary. Configure local or hosted processing for every tier,
+including embeddings and optional memory workers. Task complexity, model choice,
+and available tools determine cost and latency.
 
-## Governance dashboard
+See [Security](/security) for data flow and [Portability](/portability) for
+capabilities that require external services or specific storage backends.
 
-Per-agent activity, token consumption, task volume, and firewall catch rate —
-the same dashboard we use to run deployments is the one you get.
+## SDK and applications
 
-Building your own admin surface over the registry instead? See
-[Listing agents](/listing-agents) — two endpoints return agents and they
-answer different questions.
+Install the Python package with `pip install libraos-sdk` and import
+`from libraos import Client`. Source, API contracts, and language clients live
+in [libraos/sdk](https://github.com/libraos/sdk).
 
-## Knowledge Packs
-
-Industry knowledge as installable modules, built from licensed and public
-content. Add a vertical's expertise without a data project.
-
-## Capability modules
-
-Language, voice, and vision are additive. Start with documents; switch on voice
-and video when you're ready. Nothing gets rebuilt.
-
-## SDK and app kit
-
-[`libra-os-sdk`](https://github.com/libraos/sdk) (Apache-2.0) for teams building
-their own front ends on top. Channel adapters for the tools you already run —
-they get managed, not replaced.
+[Libra Desk](/desk) is an application on this platform. A developer can use
+the same runtime services from a different UI or a backend workflow.

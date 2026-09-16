@@ -1,8 +1,8 @@
 ---
 slug: /managing-memory
-sidebar_position: 6
+sidebar_position: 7
 title: Managing memory
-description: The four things that persist across a conversation — and how to turn each on, scope it to the right person, inspect it, and switch it off.
+description: Choose conversation history, observations, persisted fields, or an employee house profile, and understand their identity scopes.
 ---
 
 # Managing memory
@@ -16,25 +16,35 @@ different lifetimes, different scopes, and different switches.
 
 | What | Lifetime | Scoped to |
 | --- | --- | --- |
-| **Conversation** | One thread | `conversation_id` |
-| **Observational memory** | Indefinite | person + agent |
-| **Persisted fields** | Indefinite | session, or person + agent |
-| **House profile** | Indefinite | the employee who owns the agent |
+| **Conversation** | Stored according to the conversation store's retention | Authorized caller + `conversation_id` |
+| **Observational memory** | Until removed or handled by configured retention | Resolved caller identity + agent + applicable context scope |
+| **Persisted fields** | Until reset or removed | Session, or resolved person + agent |
+| **House profile** | Until updated or removed | Employee and applicable corporate context |
 
 Knowledge collections are deliberately not in this table. They are documents
 you put there on purpose — see [Workspaces & memory](/workspaces-memory).
 
 ## Conversation threads
 
-The simplest form. Pass a `conversation_id` and the turn continues that
-thread; omit it and the turn stands alone.
+For native chat, save the returned `conversation_id` and pass it on the next
+turn under the same authorized identity:
 
-```jsonc
-{ "conversation_id": "case-4471", "messages": [ ... ] }
+```json
+{
+  "conversation_id": "case-4471",
+  "message": "What information is still missing?"
+}
 ```
 
-Nothing is inferred and nothing is extracted. When the thread ends, it ends.
-If all you need is "remember what we just said," this is the whole feature.
+This body belongs to `/agents/v1/{agent}/chat`. For `/v1/messages`, send the
+`messages` array; a stable `conversation_id` (also accepted in metadata) opts
+into conversation persistence. The Python SDK can pass
+`metadata={"conversation_id": "case-4471"}`. Explicitly sending the required
+history is the portable approach across compatible clients.
+
+A thread ID does not grant access to another user's conversation. Ending a
+thread does not erase its stored transcript. Conversation history and extracted
+observations are separate stores; see [Calling agents](/calling-agents).
 
 ## Observational memory
 
@@ -60,31 +70,32 @@ LIBRA_OS_REFLECTOR_THRESHOLD=32000    # dedupe after this many
 LIBRA_OS_MEMORY_WORKER_MODEL=...      # a cheap model is the right choice here
 ```
 
-Both run **after** the response is sent, so they never add latency to a turn.
-Point the worker model at your cheap tier — this is high-volume, low-stakes
-summarization, not reasoning.
+Observation and reflection run as background work. Facts may not be available
+immediately after a turn. Choose a model that can extract accurate facts at your
+expected volume; stored observations may influence later decisions.
 
 ### Who the memory belongs to
 
-This is the part to get right before enabling it. Memory is scoped to a triple
-of **platform user, end user, and agent**, taken from request headers:
+The server resolves memory identity from the authenticated caller, the agent,
+and the endpoint's context. Storage includes legacy platform/end-user/agent
+keys and canonical authenticated-user identity. It is not accurately described
+as one universal `(API key, end user, agent)` key.
 
-```
-X-Platform-User: acme-corp      # your tenant
-X-End-User:      jane@acme.com  # the person
-```
+For normal signed-in users, the authenticated identity is authoritative.
+`X-End-User` and `X-Canonical-User` overrides are honored only for callers with
+the deployment's impersonation capability. An authorized backend can supply
+those selectors; an arbitrary browser header cannot grant that authority.
+`X-Platform-User` is a legacy memory selector, not a tenant authorization claim.
 
-The agent is the one being addressed. Same person, different agent means a
-different memory — an HR assistant does not accumulate what a support agent
-learned.
+A shared service credential does not by itself distinguish your customers.
+Have the operator configure and verify the supported end-user mapping, then
+test two users across two conversations before enabling long-term memory.
+Do not assume that adding only `X-End-User` establishes every required identity
+axis: canonical identity can also affect which observations are read.
 
-If you send no identity headers, every caller shares one pool. On a
-multi-person deployment that is almost never what you want, and it is the
-single most common misconfiguration: one user's context surfacing in another
-user's answers. **Set the headers before enabling memory, not after.**
-
-Facts recognized as personal are routed to a per-person pool rather than the
-shared one, so private context does not leak into team-visible memory.
+Different agents keep distinct observation scopes. Personal/corporate context
+separation, where enabled, adds another boundary. Sharing `owner_employee`
+does not merge the agents' observations.
 
 ### Turning it off
 
@@ -117,7 +128,9 @@ to a list without duplicates.
 
 Known values are injected into the next turn as a small system block, so the
 model stops re-asking. `session` scope ties the values to one conversation;
-`end_user_agent` keeps them for that person and agent indefinitely.
+`end_user_agent` keeps them for that resolved person and agent until they are
+reset or removed. The example is a configuration fragment: define the matching
+output schema too, so `collected_params` is part of the agent's validated output.
 
 Use this instead of observational memory when the thing you need is a specific
 slot rather than a general impression. It is deterministic — a field is set or
@@ -126,10 +139,13 @@ it is not — which matters when the value drives a decision.
 ## House profile
 
 A per-employee markdown document — playbook, house style, escalation rules —
-injected into **every agent that employee owns**. It is how a firm's way of
-working reaches its agents without editing each one.
+available to agents through their employee association. It is how a firm's
+operating instructions reach agents without editing each prompt. When dual
+personal/corporate scopes are enabled, house-profile injection applies in
+corporate context; personal context omits it. This is separate from the
+employee file's descriptive Markdown body.
 
-```bash
+```text
 GET  /v1/managed/employees/{id}/house-profile
 PUT  /v1/managed/employees/{id}/house-profile
 ```
@@ -137,6 +153,14 @@ PUT  /v1/managed/employees/{id}/house-profile
 No profile means no injection and no behaviour change. It is capped at 8 KB;
 it is meant to be read and edited by a person, so keep it short enough that
 someone will.
+
+## Retention and deletion
+
+Disabling observational memory stops its use; it is not a deletion request.
+Conversation transcripts, observation logs, structured fields, house profiles,
+job results, and backups are separate data sets. Confirm the deletion mechanism
+and identity scope for each store in your installed release before promising
+that one operation removes all of a person's data.
 
 ## Choosing between them
 
@@ -150,8 +174,8 @@ someone will.
 
 ## What leaves the deployment
 
-Nothing here does. The observation logs, the persisted values and the house
-profile live in your database. The worker model sees turn content in order to
+The observation logs, persisted values, and house profile are stored in your
+deployment. Their contents can enter model prompts. The worker model sees turn content in order to
 summarize it, so if that tier is a hosted model, the summarization prompt goes
 where that model runs — point `LIBRA_OS_MEMORY_WORKER_MODEL` at a local model
 if that matters to you. See the [security model](/security) and
