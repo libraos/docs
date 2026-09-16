@@ -66,6 +66,19 @@ and `callback`. Model inheritance is per slot: an agent can override `answer`
 and still inherit `planner`. `owner` identifies the user allowed to manage the
 employee record; it does not automatically set the agent's own `owner`.
 
+:::caution Employee defaults and reload order
+In the inspected server implementation, startup builds agents before loading
+employees, and SIGHUP rebuilds agents before reloading employee files. The admin
+agent-reload endpoint does not itself reload employee files. Consequently,
+employee defaults can be missing at startup or one reload behind an edit.
+
+After startup, trigger an agent reload once employees have loaded. After editing
+an employee file, send SIGHUP, wait for the employee reload to complete, then
+trigger the admin agent-reload endpoint. Check logs and an execution result to
+confirm the intended configuration. Releases that fix this ordering may no
+longer need the extra step.
+:::
+
 ## An agent file
 
 Save this minimal linked agent as `data/agents/intake.md`:
@@ -140,19 +153,23 @@ are present.
 
 The YAML never declares "local" or "cloud" — it just names model ids, and the
 deployment's gateway (`OPENAI_API_BASE`) determines which namespace those ids
-live in. Against a **routing gateway**, ids carry a `provider/` prefix — with
-the covered `-Ent` variants on a [token plan](/model-settings):
+live in. Against a **routing gateway**, ids carry a `provider/` prefix:
 
 ```yaml
 model_config:
   answer:
-    primary: anthropic/claude-sonnet-5-Ent
-    fallback: [gemini/gemini-2.5-pro-Ent]
+    primary: anthropic/claude-opus-4-7
+    fallback: [gemini/gemini-2.5-flash]
   planner:
-    primary: anthropic/claude-opus-5-Ent
+    primary: anthropic/claude-opus-4-7
   skill:
-    primary: gemini/gemini-2.5-flash-lite-Ent
+    primary: gemini/gemini-2.5-flash-lite
 ```
+
+Some plans additionally serve `-Ent` variants of these ids. They are not
+present on every account, so list `GET /v1/models` against your own gateway
+before pinning one, and see [Model settings](/model-settings) for what the
+suffix does and does not guarantee.
 
 Against a **local Ollama server** ([Local models](/model-settings#local-models)),
 ids are the server's bare model names — no prefix, per the standing Ollama
@@ -168,6 +185,10 @@ model_config:
     primary: llama3.2:3b
 ```
 
+Bare Ollama ids are accepted in **files**. The managed-agents API is stricter:
+`POST`/`PUT /v1/agents` reject any id without a `provider/` prefix, so the same
+`model_config` that loads from disk is refused through the API.
+
 Pin only ids your gateway actually serves — anything else 404s at call time.
 For an employee meant to run on **both** kinds of deployment, pin nothing:
 with no `model_config` it inherits the deployment's default models through
@@ -180,9 +201,18 @@ installs alike (this is why the SDK templates ship modelless).
 | --- | --- |
 | `skills` (alias `tools`) | Installed skill/tool references. Agent references can delegate behavior; tool-pack references load operations. Check the installed catalog for the ID's meaning |
 | `direct_tools` | The escape hatch: attach a skill's tool definitions to the agent's **own** LLM call, so the agent's prompt governs how the tool is used (e.g. "print base64 inline") |
-| `capabilities` | Free-form capability tags used for discovery and routing |
+| `capabilities` | Routing labels the planner dispatches on. On a `brain: true` persona these build the skill map — see the note below |
 | `custom_tools` | Partner-defined tools: `name`, `description`, `input_schema` (JSON Schema), optional per-tool `callback`, plus `side_effects`, `risk_tier` (low/medium/high), and dry-run support for the configured approval path |
 | `callback` | Agent-level webhook for custom tools; cascade is tool → agent → employee |
+
+:::caution Declare `capabilities` on a `brain: true` persona
+On a persona with `brain: true`, an empty `capabilities` means an **empty skill
+map**: the planner can dispatch nothing, and every question is answered from the
+model's own memory instead. `skills:` alone is decorative on a persona. The
+server logs this at ERROR per agent at boot (`persona_dispatch:<id>`). If you
+set `brain: true`, declare `capabilities` with the routing labels the planner
+should dispatch on.
+:::
 
 ### Knowledge
 
@@ -232,18 +262,6 @@ installs alike (this is why the SDK templates ship modelless).
   identifier is resolved as `agent_id` → `id` → `name`. Prefer the canonical
   names shown above for new files.
 
-:::caution Employee defaults and reload order
-In the inspected server implementation, startup builds agents before loading
-employees, and SIGHUP rebuilds agents before reloading employee files. The admin
-agent-reload endpoint does not itself reload employee files. Consequently,
-employee defaults can be missing at startup or one reload behind an edit.
-
-After startup, trigger an agent reload once employees have loaded. After editing
-an employee file, send SIGHUP, wait for the employee reload to complete, then
-trigger the admin agent-reload endpoint. Check logs and an execution result to
-confirm the intended configuration. Releases that fix this ordering may no
-longer need the extra step.
-:::
 
 ## Start from a template
 
