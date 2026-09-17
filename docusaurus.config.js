@@ -19,10 +19,17 @@ const config = {
   onBrokenLinks: 'throw',
   onBrokenAnchors: 'throw',
   markdown: {
+    mermaid: true,
     hooks: {
       onBrokenMarkdownLinks: 'throw',
     },
   },
+
+  // Mermaid renders client-side. Diagrams are therefore invisible to anything
+  // reading the raw page — including the llms.txt this site generates — so a
+  // diagram that carries load-bearing information should still say it in prose
+  // nearby, not only in the graph.
+  themes: ['@docusaurus/theme-mermaid'],
 
   i18n: {defaultLocale: 'en', locales: ['en']},
 
