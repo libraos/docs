@@ -37,6 +37,10 @@ Check it:
 libraos --version
 ```
 
+> Running in Docker or Kubernetes instead? Skip to
+> [Run it as a container](#run-it-as-a-container) — the configuration is the
+> same, but the container needs one flag the binary does not.
+
 ## 2. Configure and start — about three minutes
 
 ```bash
@@ -156,6 +160,155 @@ Two fields to notice:
 You have created an executable agent and called it through the native API.
 An employee record is optional shared configuration; it is not required to make
 this request. See [the object model](/agents) and [API formats](/calling-agents).
+
+## Run it as a container
+
+The steps above install a binary. The published image runs the same server —
+`ghcr.io/libraos/libraos`, entrypoint `libraos serve`, listening on **8900**.
+
+Pin a tag from [releases](https://github.com/libraos/libraos/releases). `:latest`
+moves only on production cutovers (`vX.Y.Z`); weekly tags
+(`vX.Y.Z-week-YYYY-MM-DD`) never move it, and weeklies are built for
+`linux/amd64` only — production tags carry `linux/arm64` as well, which matters
+if your nodes are arm.
+
+:::warning `--ulimit memlock=-1` is required, not optional
+Without it the server **refuses to start** and exits 1:
+
+```
+memlock: RLIMIT_MEMLOCK soft cap is 65536 bytes, below the 8388608-byte minimum
+```
+
+Docker's default memlock cap is 64 KiB. Under memcg accounting the kernel
+charges every `epoll_ctl(EPOLLET)` item against that cap, and Go's netpoll uses
+`EPOLLET` for every file descriptor — so a non-trivial request load exhausts it
+and the process dies inside the runtime rather than returning an error. The
+guard refuses to boot instead of letting that happen.
+:::
+
+### Docker
+
+```bash
+docker network create libraos-net
+
+docker run -d --name libraos-pg --network libraos-net \
+  -e POSTGRES_USER=libraos -e POSTGRES_PASSWORD='<strong-password>' \
+  -e POSTGRES_DB=libraos \
+  -v libraos-pgdata:/var/lib/postgresql/data \
+  postgres:16-alpine
+
+docker run -d --name libraos --network libraos-net -p 8900:8900 \
+  --ulimit memlock=-1 \
+  -e LIBRA_OS_PUBLIC_URL=http://localhost:8900 \
+  -e LIBRA_OS_ADMIN_EMAIL='you@example.com' \
+  -e LIBRA_OS_ADMIN_PASSWORD='<12+ chars>' \
+  -e LIBRA_OS_JWT_SECRET='<openssl rand -base64 48>' \
+  -e LIBRA_OS_DATABASE_URL='postgres://libraos:<strong-password>@libraos-pg:5432/libraos?sslmode=disable' \
+  -e OPENAI_API_BASE=https://api.meganova.ai \
+  -e OPENAI_API_KEY='<your key>' \
+  -e OPENAI_MODEL='<a model your gateway serves>' \
+  -v libraos-runtime:/app/data/agents/_runtime \
+  ghcr.io/libraos/libraos:<tag>
+
+curl -fsS http://localhost:8900/health
+```
+
+From here, steps 3 and 4 above are unchanged — mint a token, create an agent.
+
+### Two volumes that are not optional
+
+**`/app/data/agents/_runtime`.** Agents created through `POST /v1/agents` are
+written here as Markdown files. Without a volume they exist only in the
+container's writable layer, so every agent you create through the API
+disappears on the next `docker run`. The image ships its bundled agents at
+`/app/data/agents/`; only the `_runtime` subdirectory needs to persist.
+
+**Postgres data.** Conversations, settings, audit and memory live in the
+database, not in the container.
+
+`LIBRA_OS_JWT_SECRET` must also be the same value across restarts — regenerate
+it and every outstanding token stops working.
+
+### Kubernetes
+
+The same three requirements apply: the memlock limit, a persistent volume for
+runtime agents, and a stable JWT secret from a Secret rather than the manifest.
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: libraos
+spec:
+  serviceName: libraos
+  replicas: 1
+  selector:
+    matchLabels: { app: libraos }
+  template:
+    metadata:
+      labels: { app: libraos }
+    spec:
+      securityContext:
+        # The memlock guard above. Without IPC_LOCK the pod CrashLoopBackOffs
+        # on the same RLIMIT_MEMLOCK error as Docker.
+        capabilities:
+          add: ["IPC_LOCK"]
+      containers:
+        - name: libraos
+          image: ghcr.io/libraos/libraos:<tag>
+          ports:
+            - containerPort: 8900
+          envFrom:
+            - secretRef: { name: libraos-secrets }
+          env:
+            - name: LIBRA_OS_PUBLIC_URL
+              value: https://libraos.example.com
+            - name: OPENAI_API_BASE
+              value: https://api.meganova.ai
+          volumeMounts:
+            - name: runtime-agents
+              mountPath: /app/data/agents/_runtime
+          readinessProbe:
+            httpGet: { path: /health, port: 8900 }
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet: { path: /health, port: 8900 }
+            initialDelaySeconds: 30
+  volumeClaimTemplates:
+    - metadata:
+        name: runtime-agents
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests: { storage: 1Gi }
+```
+
+`LIBRA_OS_JWT_SECRET`, `LIBRA_OS_ADMIN_PASSWORD`, `LIBRA_OS_DATABASE_URL` and
+`OPENAI_API_KEY` belong in the `libraos-secrets` Secret, not in the manifest.
+
+**A StatefulSet with one replica, deliberately.** Runtime agents are files on a
+`ReadWriteOnce` volume, so a second replica would neither see agents created by
+the first nor be able to mount the same claim on most storage classes. Scale
+horizontally only after moving agent definitions into the database or onto
+shared storage — and note that `LIBRA_OS_INSTANCE_ID` (defaulting to
+`<hostname>-<pid>`) is what marks orphaned async jobs at startup, so several
+replicas sharing one database need distinct values.
+
+**Bring your own Postgres.** Use a managed instance or an operator; the
+single-container Postgres above is for a laptop, not a cluster.
+
+### What this basic setup does not include
+
+Vector retrieval needs SurrealDB. Without it the deployment falls back to a
+lexical-only store, which still answers but cannot match on meaning — and it
+says so at boot and in `GET /api/capabilities`. See
+[Deploy Libra OS](/deployment) for the knowledge-store options, and run
+`libraos doctor deployment` inside the container to check what is actually
+active:
+
+```bash
+docker exec libraos libraos doctor deployment
+```
 
 ## What's next
 
