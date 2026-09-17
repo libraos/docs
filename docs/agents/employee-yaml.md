@@ -41,29 +41,25 @@ Four things accumulate state, and they are scoped by four different keys.
 Knowing which is which is the difference between two agents sharing a memory
 on purpose and merging one by accident.
 
+```mermaid
+flowchart TD
+    W["<b>USER WORKSPACE</b><br/><code>users/&lt;user_id&gt;/</code><br/>private files, per human"]
+
+    E["<b>EMPLOYEE</b> — defaults only<br/><code>data/employees/&lt;id&gt;.md</code><br/>model_config · web_search_config · callback<br/>+ house-profile key (tenant, employee)"]
+    D["<b>AGENT DEFINITION</b><br/><code>data/agents/&lt;id&gt;.md</code><br/>system prompt · tools · knowledge_bindings"]
+    R["<b>AGENT RUNTIME</b><br/>answers a turn<br/><code>/agents/v1/&lt;agent-id&gt;/chat</code>"]
+    M["<b>MEMORY</b><br/>(platform_user, end_user, memory_scope)<br/>observation log · facts · episodes"]
+
+    W --- E
+    W --- D
+    W --- M
+    E -- "owner_employee:<br/>inherits per slot, agent wins" --> D
+    D -- "instantiated at boot" --> R
+    R -. "reads / appends" .-> M
 ```
-  USER WORKSPACE                     users/<user_id>/
-  ──────────────                     private files, path-rewritten, per human
-        │                            (never shared between users)
-        │
-        ├── EMPLOYEE ..............  data/employees/<id>.md
-        │   defaults only           model_config · web_search_config · callback
-        │   (config, not control)   + the house profile key (tenant, employee)
-        │        │
-        │        │ owner_employee:  agent inherits per slot, agent wins
-        │        ▼
-        ├── AGENT DEFINITION .....  data/agents/<id>.md
-        │   the YAML + prompt       system prompt, tools, knowledge_bindings
-        │        │
-        │        │ instantiated at boot, one long-lived object per definition
-        │        ▼
-        │   AGENT RUNTIME .........  what actually answers a turn
-        │   addressed as            /agents/v1/<agent-id>/chat
-        │
-        └── MEMORY ...............  (platform_user, end_user, memory_scope)
-            observational log,     defaults to the agent id — see below
-            facts, episodes
-```
+
+The employee supplies configuration and the house-profile key. It is not in the
+call path: nothing routes to it, and `owner_employee` grants no permission.
 
 **The employee is a defaults profile, not a controller.** It supplies
 configuration down a cascade and keys the house profile. It is never invoked,
