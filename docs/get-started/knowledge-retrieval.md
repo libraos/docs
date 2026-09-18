@@ -11,10 +11,12 @@ Two settings decide whether your knowledge base answers questions semantically
 or only by keyword, and neither of them is named in a way that makes the answer
 obvious. This page is the short version of both.
 
-:::warning Upgrading to v0.1.18: auto-indexing is now opt-in
+:::warning Auto-indexing is opt-in since v0.1.18
 
-`LIBRA_OS_SUPERNOVA_ENABLED` defaults to **`false`** as of v0.1.18. If you rely
-on uploaded documents being indexed automatically, set it:
+`LIBRA_OS_SUPERNOVA_ENABLED` defaults to **`false`** from v0.1.18 onward — the
+current v0.1.19 line carries the same default. If you are coming from an
+earlier release and rely on uploaded documents being indexed automatically,
+set it:
 
 ```bash
 LIBRA_OS_SUPERNOVA_ENABLED=true
@@ -155,8 +157,9 @@ chunks than your database does.
 Every release carries a checksum manifest:
 
 ```bash
-gh release download v0.1.18 --pattern 'libraos-v0.1.18-*'
-sha256sum -c --ignore-missing libraos-v0.1.18-SHA256SUMS
+TAG=v0.1.19   # or the tag you are installing
+gh release download "$TAG" --pattern "libraos-$TAG-*"
+sha256sum -c --ignore-missing "libraos-$TAG-SHA256SUMS"
 ```
 
 The [public mirror](https://github.com/libraos/releases) publishes its own

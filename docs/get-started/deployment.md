@@ -68,7 +68,7 @@ gateway, and the running server — and prints a fix line for anything wrong.
 
 Which backend actually holds vectors, how to confirm retrieval is working, and
 how to scope auto-indexing: see **[Knowledge base & retrieval](/knowledge-retrieval)**.
-If you are upgrading to v0.1.18, read the auto-indexing note there first — the
+If you are upgrading from before v0.1.18, read the auto-indexing note there first — the
 default changed.
 
 ## Reference stack
