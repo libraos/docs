@@ -2,7 +2,7 @@
 slug: /benchmarks
 sidebar_position: 3
 title: Benchmarks
-description: Measured, not marketed — controlled same-model A/B results for the Libra OS system layer.
+description: Measured, not marketed — controlled same-model A/B results for the LibraOS system layer.
 ---
 
 # Measured, not marketed

@@ -15,7 +15,7 @@ and dependencies as described in [Security](/security).
 
 ## Prerequisites
 
-- A running Libra OS deployment and an API key
+- A running LibraOS deployment and an API key
 - The SDK: `pip install libraos-sdk`, with `LIBRA_OS_URL` /
   `LIBRA_OS_API_KEY` exported
 - Access to your existing ticketing system (and its webhook or polling API)
@@ -57,8 +57,8 @@ classifier's instructions and examples will be.
 - **Multilingual by default** — one classifier for every language your
   customers write in.
 
-And the Libra OS-specific reason: tickets contain names, account details, and
-sometimes regulated data. Libra OS lets you choose local model processing and
+And the LibraOS-specific reason: tickets contain names, account details, and
+sometimes regulated data. LibraOS lets you choose local model processing and
 configure screening and authorization around the classification workflow.
 
 ### Define your intent taxonomy

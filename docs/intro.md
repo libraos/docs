@@ -2,16 +2,16 @@
 slug: /
 sidebar_position: 1
 title: Introduction
-description: Build applications on Libra OS — understand the runtime, create an agent, connect knowledge and tools, and operate your deployment.
+description: Build applications on LibraOS — understand the runtime, create an agent, connect knowledge and tools, and operate your deployment.
 ---
 
-# Build on Libra OS
+# Build on LibraOS
 
 Your knowledge. Your infrastructure. Your digital workforce.
 
-Libra OS is a runtime for applications that use agents, enterprise knowledge,
+LibraOS is a runtime for applications that use agents, enterprise knowledge,
 and tools. Your application supplies the user experience and business logic;
-Libra OS runs agents and provides model routing, retrieval, persistence, and
+LibraOS runs agents and provides model routing, retrieval, persistence, and
 governance features.
 
 You can use the Python SDK, native HTTP APIs, or compatible model APIs.
@@ -34,7 +34,7 @@ your own without adopting Desk's interface or workflow.
    [background tasks](/durable-runs), and check [deployment](/deployment)
    and [portability](/portability) requirements.
 
-6. **Build an application on it:** [Build on Libra OS](/build-on-libraos)
+6. **Build an application on it:** [Build on LibraOS](/build-on-libraos)
    covers the SDK, the published API contract, and the CLI — start there if you
    are writing against a deployment rather than operating one.
 

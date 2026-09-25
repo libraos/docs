@@ -15,7 +15,7 @@ receive customer data; use local services when your deployment must stay offline
 
 ## Prerequisites
 
-- A running Libra OS deployment — see [Getting started](/getting-started)
+- A running LibraOS deployment — see [Getting started](/getting-started)
 - **Python 3.10+** and the SDK: `pip install libraos-sdk`
 - A deployment credential authorized to create and invoke the agent:
 
@@ -38,7 +38,7 @@ Indicators that an agent should take part of the load:
 - **Consistent brand voice** — one reviewed persona file instead of per-agent
   variation.
 
-And the indicators specific to choosing **Libra OS** as the substrate:
+And the indicators specific to choosing **LibraOS** as the substrate:
 
 - **The conversations can't leave your network** — support chats carry
   account data, order history, sometimes regulated PII.
@@ -93,7 +93,7 @@ Set targets with your support team before shipping. Task metrics:
 | Topic adherence | ≥ 95% |
 | Escalation accuracy (escalated when it should) | ≥ 95% |
 
-These are example evaluation targets, not measured Libra OS guarantees.
+These are example evaluation targets, not measured LibraOS guarantees.
 Choose thresholds from your baseline and the cost of each error.
 
 Business metrics might include deflection rate, CSAT ≥ 4/5,
@@ -104,9 +104,9 @@ improved across the conversation.
 
 Building this directly on a model API means assembling a prompt scaffold, a
 RAG pipeline, a tool-use loop, guardrails, and an escalation path yourself.
-On Libra OS those are configuration:
+On LibraOS those are configuration:
 
-| You'd normally build | On Libra OS |
+| You'd normally build | On LibraOS |
 | --- | --- |
 | System prompt engineering, brand voice | The persona template — a reviewed Markdown file you edit |
 | RAG pipeline (chunking, embedding, retrieval, citation) | Collections + bindings; inspect retrieval evidence and handle insufficient sources |
