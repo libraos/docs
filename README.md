@@ -1,6 +1,6 @@
-# Libra OS — Docs & Blog
+# LibraOS — Docs & Blog
 
-Developer-editable documentation and blog for **Libra OS**, built with
+Developer-editable documentation and blog for **LibraOS**, built with
 [Docusaurus](https://docusaurus.io). SEO-friendly static output, Google Analytics
 on every page, and an auto-generated **`llms.txt`** so AI agents (and our own
 help widget) can read the docs cleanly.
@@ -79,5 +79,5 @@ deploy — so external PRs get build validation without deployment access.
 ## License
 
 Docs and blog content: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-Site build code: MIT. See [LICENSE](LICENSE). The Libra OS name and logo are
+Site build code: MIT. See [LICENSE](LICENSE). The LibraOS name and logo are
 trademarks of Nebula Nova Inc.

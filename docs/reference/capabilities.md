@@ -2,12 +2,12 @@
 slug: /capabilities
 sidebar_position: 1
 title: Core capabilities
-description: Map application requirements to Libra OS runtime features and their configuration.
+description: Map application requirements to LibraOS runtime features and their configuration.
 ---
 
 # Core capabilities
 
-Libra OS supplies the runtime services below. Your application decides which
+LibraOS supplies the runtime services below. Your application decides which
 agents to call, what users may do, and how to present results and review work.
 
 | Application need | Runtime feature | Start here |
@@ -32,7 +32,7 @@ has access to it; configure bindings and tool availability.
 ## Models and data flow
 
 Model IDs are served by your configured endpoint; they are not models bundled
-inside the Libra OS binary. Configure local or hosted processing for every tier,
+inside the LibraOS binary. Configure local or hosted processing for every tier,
 including embeddings and optional memory workers. Task complexity, model choice,
 and available tools determine cost and latency.
 

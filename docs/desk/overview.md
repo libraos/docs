@@ -2,12 +2,12 @@
 slug: /desk
 sidebar_position: 1
 title: What Libra Desk is
-description: The company workspace on Libra OS — a shared, governed queue where agents draft and a person approves, with an audit trail behind every outbound action.
+description: The company workspace on LibraOS — a shared, governed queue where agents draft and a person approves, with an audit trail behind every outbound action.
 ---
 
 # What Libra Desk is
 
-**Libra Desk** is the company workspace that runs on Libra OS. Libra OS is the
+**Libra Desk** is the company workspace that runs on LibraOS. LibraOS is the
 platform — the agent runtime, model routing, knowledge indexing and identity.
 Desk is what your team actually opens: a shared queue of customer work, with
 agents drafting and people deciding.
@@ -142,6 +142,6 @@ action APIs.
 
 ## Where it runs
 
-Desk deploys alongside a Libra OS kernel — hosted or self-hosted, the same as
+Desk deploys alongside a LibraOS kernel — hosted or self-hosted, the same as
 the platform. See [Cloud vs Self-Hosted](/editions) for the trade-off, and
 [Deployment](/deployment) for how a desk is stood up.

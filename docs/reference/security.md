@@ -7,7 +7,7 @@ description: Where data is stored and processed, how identity and tools are auth
 
 # Security & data boundaries
 
-Libra OS can run inside your infrastructure. Its configuration determines which
+LibraOS can run inside your infrastructure. Its configuration determines which
 data is processed locally and which data goes to external services.
 
 ## Storage and processing are separate
