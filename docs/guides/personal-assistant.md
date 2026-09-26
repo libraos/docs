@@ -11,7 +11,8 @@ with their LibraOS account and get an assistant that:
 
 - chats with them, using the app's **own agent**;
 - keeps their **conversations**, so they can list and resume them;
-- answers from **their documents**, which nobody else can search;
+- answers from **their documents**, which nobody else can search, and stops
+  when they delete one;
 - **remembers** what they said, even in a brand-new conversation.
 
 ![The assistant answering from an uploaded document, with what it remembers about the user on the right](./img/personal-assistant-documents.png)
@@ -78,6 +79,9 @@ Then start the kernel:
 docker compose up -d
 curl http://localhost:8900/health     # {"service":"libraos","status":"ok"}
 ```
+
+The compose file runs kernel **v0.1.21**, the minimum for this tutorial.
+`curl http://localhost:8900/api/version` shows the one running.
 
 :::tip Three first-run gotchas, already handled in the compose file
 - **`LIBRA_OS_PUBLIC_URL` is required.** Tokens name it as their issuer.
@@ -213,16 +217,35 @@ npm run dev     # http://localhost:5180 — sign in as demo@example.com
 const res = await authFetch(`/v1/apps/personal-assistant/agents/assistant/chat`, {
   method: "POST",
   headers: { "content-type": "application/json" },
-  body: JSON.stringify({ messages, conversation_id: conversationId ?? undefined }),
+  body: JSON.stringify({ messages, conversation_id: conversationId ?? undefined, stream: true }),
 });
-// → { response, conversation_id, cited_sources, … }
+// → server-sent events, one JSON object per `data:` line
 ```
+
+With `"stream": true` the reply arrives as it's written. Each event has a
+`type`:
+
+| `type` | Carries |
+|---|---|
+| `text` | the next piece of the reply, in `content` |
+| `content` | the whole reply again, once, at the end |
+| `error` | why the turn failed, in `error` (a `done` still follows) |
+| `done` | `conversation_id`, `cited_sources`, `grounding`, `usage` |
+
+The app reads the body with `fetch` and a stream reader. `EventSource` won't
+do here: it can't `POST` or send a bearer token. It appends each `text`,
+treats `content` as the final text (append it too and you'd double the
+answer), and takes `conversation_id` from `done`.
 
 - **`authFetch` adds the user's token,** and refreshes it once on a 401.
 - **Send the whole conversation every turn.** `conversation_id` only says
   which thread to save the turn into.
-- **Replies are Markdown.** The app renders them with `react-markdown`, which
-  never injects raw HTML.
+- **Replies are Markdown.** The app renders them with `react-markdown` as they
+  grow; it never injects raw HTML.
+- **Streamed turns count as much as any other.** They're saved to the
+  conversation and to the user's memory (Step 8). Leave out `stream` and you
+  get the whole reply as one JSON object instead:
+  `{response, conversation_id, cited_sources, …}`.
 
 ## Step 6 — Conversations
 
@@ -259,6 +282,21 @@ await authFetch("/api/documents/upload/my-documents", { method: "POST", body: fo
   kernel falls back to Postgres full-text search. Ask with words that appear
   in the document.
 
+Listing and deleting are one call each:
+
+```ts
+await authFetch("/api/documents/tree/my-documents");                 // → { files: [{ name }, …] }
+await authFetch(`/api/documents/rm/my-documents/${encodeURIComponent(name)}`, { method: "DELETE" });
+```
+
+- **Delete with `/api/documents/rm/…`.** It removes the file *and* its indexed
+  text, so a new conversation can no longer answer from it. The kernel also
+  has `DELETE /api/documents/file/…`, which removes only the file and leaves
+  its text searchable.
+- **Deleting a file doesn't touch memory.** If the user asked about the file
+  in a chat, the assistant may recall that answer later from memory, without
+  searching any document. A fact that was only ever in the file is gone.
+
 ## Step 8 — Memory
 
 Set `LIBRA_OS_OBSERVATIONAL_MEMORY=1` and the kernel remembers each user per
@@ -292,14 +330,13 @@ caller's own memory. Recall works before the notes appear.
 These features were left out on purpose. The cookbook README has the details
 for each.
 
-- **Streaming replies.** The kernel can stream, but streamed turns aren't
-  written to long-term memory yet, so the app waits for the full reply.
 - **The user's own Gmail or calendar.** Connectors are organisation-wide today.
 - **Acting on the user's behalf with their approval.** Only admins can approve
   actions that have side effects.
 - **Scheduled tasks,** such as a daily briefing.
-- **Removing a document from search.** Deleting the file doesn't remove its
-  indexed text.
+- **Seeing or deleting memory item by item.** The user sees the condensed
+  notes, but can't remove one. That includes what the assistant learned in a
+  chat about a document they have since deleted.
 
 ## Next steps
 
