@@ -1,0 +1,837 @@
+{
+ "schema_version": 2,
+ "tier": "public starter profiles",
+ "as_of": "2026-10-01",
+ "libraos_release": "v0.2.0-rc3",
+ "notice": "Starting points only: settings, licence notes and known problems per hardware and task. Validate on your own documents before relying on a model.",
+ "statuses": {
+  "recommended_starting_point": "Recommended starting point for this hardware and task.",
+  "validated": "Validated for this hardware and task; not the recommended starting point.",
+  "validation_stale": "Was validated on an older LibraOS release; re-validation pending.",
+  "not_yet_validated": "Not yet validated.",
+  "crashed_on_this_hardware": "Crashed this hardware in our testing."
+ },
+ "profiles": [
+  {
+   "profile_id": "dgx-spark-gb10.attachment_qa.gb10-qwen38-flash-next-hibrid48-vllm",
+   "hardware": "dgx-spark-gb10",
+   "hardware_label": "NVIDIA DGX Spark (GB10)",
+   "deployment": "Local model server: model, LibraOS and database on one box; each profile's requirements list any external service",
+   "task": "attachment_qa",
+   "task_label": "Financial-filing Q&A, document attached",
+   "model": "myllmbox/Qwen3.8-Flash-Next-hibrid48",
+   "served_name": "Qwen/Qwen3.8-Flash-Next",
+   "status": "recommended_starting_point",
+   "status_text": "Recommended starting point for this hardware and task.",
+   "serving": {
+    "engine": "vLLM 0.30 (myllmbox image v4, MTP K=5)",
+    "recipe": "myllmbox/qwen38-flash-next-recipe@004d19e",
+    "image": "myllmbox/qwen38-flash-next-vllm:v4@sha256:51629f438f5ba3f7a96db110826c783d69b91a6851c43fb07d447644f157dcc4",
+    "flags": [
+     {
+      "key": "--kv-cache-memory-bytes",
+      "value": "12000000000"
+     },
+     {
+      "key": "--max-num-seqs",
+      "value": "8"
+     },
+     {
+      "key": "--max-model-len",
+      "value": "262144"
+     },
+     {
+      "key": "--default-chat-template-kwargs",
+      "value": "{\"enable_thinking\": false}"
+     }
+    ]
+   },
+   "settings": [
+    {
+     "key": "OPENAI_API_BASE",
+     "value": "http://<model-server>:8000/v1"
+    },
+    {
+     "key": "OPENAI_MODEL",
+     "value": "Qwen/Qwen3.8-Flash-Next"
+    },
+    {
+     "key": "LIBRA_OS_BRAIN_MODEL",
+     "value": "Qwen/Qwen3.8-Flash-Next"
+    },
+    {
+     "key": "LIBRA_OS_SKILL_MODEL",
+     "value": "Qwen/Qwen3.8-Flash-Next"
+    },
+    {
+     "key": "LIBRA_OS_LLM_MAX_CONTEXT",
+     "value": "262144"
+    },
+    {
+     "key": "LIBRA_OS_VECTOR_BACKEND",
+     "value": "postgres"
+    },
+    {
+     "key": "LIBRA_OS_EMBEDDING_API_BASE",
+     "value": "<embedding-server-url>"
+    },
+    {
+     "key": "LIBRA_OS_EMBEDDING_MODEL",
+     "value": "Qwen/Qwen3-Embedding-8B"
+    },
+    {
+     "key": "LIBRA_OS_EMBED_DIM",
+     "value": "4096"
+    },
+    {
+     "key": "LIBRA_OS_MAX_INFLIGHT_PIPELINES",
+     "value": "2"
+    }
+   ],
+   "licence": {
+    "weights": "Qwen Community License",
+    "flags": [
+     {
+      "code": "hosted_service_needs_separate_licence",
+      "text": "Offering it as a hosted service needs a separate licence."
+     },
+     {
+      "code": "closed_binary_in_image",
+      "text": "The serving image contains a closed-source binary."
+     }
+    ]
+   },
+   "red_flags": [],
+   "requirements": {
+    "deployment": "hybrid",
+    "gpu": {
+     "vendor": "nvidia",
+     "families": [
+      "GB10"
+     ],
+     "min_count": 1,
+     "min_memory_gib_per_gpu": null,
+     "min_memory_gib_total": 115,
+     "unified_memory": true
+    },
+    "system": {
+     "min_ram_gib": null,
+     "arch": [
+      "arm64"
+     ],
+     "os": [
+      "linux"
+     ]
+    },
+    "runtime": {
+     "engine": "vllm",
+     "min_driver": null
+    },
+    "external_services": [
+     "gateway_embeddings"
+    ],
+    "libraos": {
+     "min": "v0.1.22",
+     "max": null
+    }
+   }
+  },
+  {
+   "profile_id": "dgx-spark-gb10.attachment_qa.gb10-qwen36-35b-a3b-nvfp4-vllm",
+   "hardware": "dgx-spark-gb10",
+   "hardware_label": "NVIDIA DGX Spark (GB10)",
+   "deployment": "Local model server: model, LibraOS and database on one box; each profile's requirements list any external service",
+   "task": "attachment_qa",
+   "task_label": "Financial-filing Q&A, document attached",
+   "model": "unsloth/Qwen3.6-35B-A3B-NVFP4",
+   "served_name": "unsloth/Qwen3.6-35B-A3B-NVFP4",
+   "status": "validated",
+   "status_text": "Validated for this hardware and task; not the recommended starting point.",
+   "serving": {
+    "engine": "vLLM (mia-vllm-gb10-linear-b12x, MTP 2)",
+    "recipe": "MiaAI-Lab/Unsloth-Qwen3.6-35b-NVFP4-DGX-Spark@79c9e6f",
+    "image": "ghcr.io/miaai-lab/mia-vllm-gb10-linear-b12x@sha256:19627342e1da2607f4db50745dca30e57d7dd0ebff06062f03fd69b43a252931",
+    "flags": [
+     {
+      "key": "--gpu-memory-utilization",
+      "value": "0.60"
+     },
+     {
+      "key": "--max-model-len",
+      "value": "262144"
+     },
+     {
+      "key": "--default-chat-template-kwargs",
+      "value": "{\"enable_thinking\":false,\"preserve_thinking\":true}"
+     }
+    ]
+   },
+   "settings": [
+    {
+     "key": "OPENAI_API_BASE",
+     "value": "http://<model-server>:8000/v1"
+    },
+    {
+     "key": "OPENAI_MODEL",
+     "value": "unsloth/Qwen3.6-35B-A3B-NVFP4"
+    },
+    {
+     "key": "LIBRA_OS_BRAIN_MODEL",
+     "value": "unsloth/Qwen3.6-35B-A3B-NVFP4"
+    },
+    {
+     "key": "LIBRA_OS_SKILL_MODEL",
+     "value": "unsloth/Qwen3.6-35B-A3B-NVFP4"
+    },
+    {
+     "key": "LIBRA_OS_LLM_MAX_CONTEXT",
+     "value": "262144"
+    },
+    {
+     "key": "LIBRA_OS_VECTOR_BACKEND",
+     "value": "postgres"
+    },
+    {
+     "key": "LIBRA_OS_EMBEDDING_API_BASE",
+     "value": "<embedding-server-url>"
+    },
+    {
+     "key": "LIBRA_OS_EMBEDDING_MODEL",
+     "value": "Qwen/Qwen3-Embedding-8B"
+    },
+    {
+     "key": "LIBRA_OS_EMBED_DIM",
+     "value": "4096"
+    }
+   ],
+   "licence": {
+    "weights": "Qwen Community License",
+    "flags": [
+     {
+      "code": "hosted_service_needs_separate_licence",
+      "text": "Offering it as a hosted service needs a separate licence."
+     }
+    ]
+   },
+   "red_flags": [],
+   "requirements": {
+    "deployment": "hybrid",
+    "gpu": {
+     "vendor": "nvidia",
+     "families": [
+      "GB10"
+     ],
+     "min_count": 1,
+     "min_memory_gib_per_gpu": null,
+     "min_memory_gib_total": 115,
+     "unified_memory": true
+    },
+    "system": {
+     "min_ram_gib": null,
+     "arch": [
+      "arm64"
+     ],
+     "os": [
+      "linux"
+     ]
+    },
+    "runtime": {
+     "engine": "vllm",
+     "min_driver": null
+    },
+    "external_services": [
+     "gateway_embeddings"
+    ],
+    "libraos": {
+     "min": "v0.1.22",
+     "max": null
+    }
+   }
+  },
+  {
+   "profile_id": "dgx-spark-gb10.attachment_qa.gb10-qwen38-flash-next-mia-nvfp4-vllm",
+   "hardware": "dgx-spark-gb10",
+   "hardware_label": "NVIDIA DGX Spark (GB10)",
+   "deployment": "Local model server: model, LibraOS and database on one box; each profile's requirements list any external service",
+   "task": "attachment_qa",
+   "task_label": "Financial-filing Q&A, document attached",
+   "model": "Mia-AiLab/Qwen3.8-Flash-Next-NVFP4",
+   "served_name": null,
+   "status": "not_yet_validated",
+   "status_text": "Not yet validated.",
+   "serving": {
+    "engine": "vLLM qwen38-flash-next image, MTP 3",
+    "recipe": "MiaAI-Lab/Qwen3.8-Flash-Next-Single-DGX-Spark@7d0712d",
+    "image": "vllm/vllm-openai:qwen38-flash-next@sha256:fc120ece0a388cc0aa1caad4a9f1cd92113484ab7ec2fd0efadd62585be05bf8",
+    "flags": []
+   },
+   "settings": [],
+   "licence": {
+    "weights": "Qwen Community License",
+    "flags": [
+     {
+      "code": "hosted_service_needs_separate_licence",
+      "text": "Offering it as a hosted service needs a separate licence."
+     },
+     {
+      "code": "recipe_agpl",
+      "text": "The serving recipe is AGPL-3.0."
+     }
+    ]
+   },
+   "red_flags": [],
+   "requirements": {
+    "deployment": "hybrid",
+    "gpu": {
+     "vendor": "nvidia",
+     "families": [
+      "GB10"
+     ],
+     "min_count": 1,
+     "min_memory_gib_per_gpu": null,
+     "min_memory_gib_total": 115,
+     "unified_memory": true
+    },
+    "system": {
+     "min_ram_gib": null,
+     "arch": [
+      "arm64"
+     ],
+     "os": [
+      "linux"
+     ]
+    },
+    "runtime": {
+     "engine": "vllm",
+     "min_driver": null
+    },
+    "external_services": [
+     "gateway_embeddings"
+    ],
+    "libraos": {
+     "min": "v0.1.22",
+     "max": null
+    }
+   }
+  },
+  {
+   "profile_id": "dgx-spark-gb10.attachment_qa.gb10-laguna-s21-nvfp4-vllm",
+   "hardware": "dgx-spark-gb10",
+   "hardware_label": "NVIDIA DGX Spark (GB10)",
+   "deployment": "Local model server: model, LibraOS and database on one box; each profile's requirements list any external service",
+   "task": "attachment_qa",
+   "task_label": "Financial-filing Q&A, document attached",
+   "model": "poolside/Laguna-S-2.1-NVFP4",
+   "served_name": "poolside/Laguna-S-2.1-NVFP4",
+   "status": "not_yet_validated",
+   "status_text": "Not yet validated.",
+   "serving": {
+    "engine": "vLLM 0.25.1 + DFlash",
+    "recipe": "MiaAI-Lab/Laguna-S-2.1-DGX-Spark-RTX-6000-PRO@750a52e",
+    "image": null,
+    "flags": [
+     {
+      "key": "--gpu-memory-utilization",
+      "value": "0.65"
+     },
+     {
+      "key": "--max-model-len",
+      "value": "163840"
+     },
+     {
+      "key": "--max-num-seqs",
+      "value": "4"
+     },
+     {
+      "key": "--default-chat-template-kwargs",
+      "value": "{\"enable_thinking\":false}"
+     }
+    ]
+   },
+   "settings": [],
+   "licence": {
+    "weights": "OpenMDW-1.1",
+    "flags": [
+     {
+      "code": "recipe_has_no_licence",
+      "text": "The serving recipe repository has no licence file."
+     }
+    ]
+   },
+   "red_flags": [],
+   "requirements": {
+    "deployment": "hybrid",
+    "gpu": {
+     "vendor": "nvidia",
+     "families": [
+      "GB10"
+     ],
+     "min_count": 1,
+     "min_memory_gib_per_gpu": null,
+     "min_memory_gib_total": 115,
+     "unified_memory": true
+    },
+    "system": {
+     "min_ram_gib": null,
+     "arch": [
+      "arm64"
+     ],
+     "os": [
+      "linux"
+     ]
+    },
+    "runtime": {
+     "engine": "vllm",
+     "min_driver": null
+    },
+    "external_services": [
+     "gateway_embeddings"
+    ],
+    "libraos": {
+     "min": "v0.1.22",
+     "max": null
+    }
+   }
+  },
+  {
+   "profile_id": "dgx-spark-gb10.attachment_qa.gb10-qwen38-27b-nvfp4-sglang",
+   "hardware": "dgx-spark-gb10",
+   "hardware_label": "NVIDIA DGX Spark (GB10)",
+   "deployment": "Local model server: model, LibraOS and database on one box; each profile's requirements list any external service",
+   "task": "attachment_qa",
+   "task_label": "Financial-filing Q&A, document attached",
+   "model": "RadixArk/Qwen3.8-27B-NVFP4-BF16-LMHead",
+   "served_name": "Qwen/Qwen3.8-27B",
+   "status": "not_yet_validated",
+   "status_text": "Not yet validated.",
+   "serving": {
+    "engine": "SGLang (MTP)",
+    "recipe": "MiaAI-Lab/Qwen3.8-27B-SGLang-DGX-Spark@9fb18ed",
+    "image": "lmsysorg/sglang:qwen38-27b@sha256:febfb971c7352570fc445c466ebd6ffc9d896024958e544a60f2137fd85856b1",
+    "flags": []
+   },
+   "settings": [],
+   "licence": {
+    "weights": "Qwen Community License",
+    "flags": [
+     {
+      "code": "hosted_service_needs_separate_licence",
+      "text": "Offering it as a hosted service needs a separate licence."
+     }
+    ]
+   },
+   "red_flags": [],
+   "requirements": {
+    "deployment": "hybrid",
+    "gpu": {
+     "vendor": "nvidia",
+     "families": [
+      "GB10"
+     ],
+     "min_count": 1,
+     "min_memory_gib_per_gpu": null,
+     "min_memory_gib_total": 115,
+     "unified_memory": true
+    },
+    "system": {
+     "min_ram_gib": null,
+     "arch": [
+      "arm64"
+     ],
+     "os": [
+      "linux"
+     ]
+    },
+    "runtime": {
+     "engine": "sglang",
+     "min_driver": null
+    },
+    "external_services": [
+     "gateway_embeddings"
+    ],
+    "libraos": {
+     "min": "v0.1.22",
+     "max": null
+    }
+   }
+  },
+  {
+   "profile_id": "dgx-spark-gb10.attachment_qa.gb10-qwen38-flash-next-mlx4-tensorfold",
+   "hardware": "dgx-spark-gb10",
+   "hardware_label": "NVIDIA DGX Spark (GB10)",
+   "deployment": "Local model server: model, LibraOS and database on one box; each profile's requirements list any external service",
+   "task": "attachment_qa",
+   "task_label": "Financial-filing Q&A, document attached",
+   "model": "Vontra/Qwen3.8-Flash-Next-MLX-4bit-MTP",
+   "served_name": "qwen/Qwen3.8-Flash-Next-TF",
+   "status": "not_yet_validated",
+   "status_text": "Not yet validated.",
+   "serving": {
+    "engine": "TensorFold v0.3.6.3 (MLX-format weights, MTP)",
+    "recipe": "MiaAI-Lab/Qwen3.8-Flash-Next-Single-DGX-Spark-TensorFold@a3aa898",
+    "image": "ghcr.io/miaai-lab/qwen3.8-flash-next-single-dgx-spark-tensorfold@sha256:fd30b84dce7a43daaa2be3443e1bd0e7c826923e9cb77a995c4720e76c752c64",
+    "flags": [
+     {
+      "key": "--parallel",
+      "value": "2"
+     }
+    ]
+   },
+   "settings": [],
+   "licence": {
+    "weights": "Qwen Community License 1.0",
+    "flags": [
+     {
+      "code": "hosted_service_needs_separate_licence",
+      "text": "Offering it as a hosted service needs a separate licence."
+     }
+    ]
+   },
+   "red_flags": [],
+   "requirements": {
+    "deployment": "hybrid",
+    "gpu": {
+     "vendor": "nvidia",
+     "families": [
+      "GB10"
+     ],
+     "min_count": 1,
+     "min_memory_gib_per_gpu": null,
+     "min_memory_gib_total": 115,
+     "unified_memory": true
+    },
+    "system": {
+     "min_ram_gib": null,
+     "arch": [
+      "arm64"
+     ],
+     "os": [
+      "linux"
+     ]
+    },
+    "runtime": {
+     "engine": "tensorfold",
+     "min_driver": null
+    },
+    "external_services": [
+     "gateway_embeddings"
+    ],
+    "libraos": {
+     "min": "v0.1.22",
+     "max": null
+    }
+   }
+  },
+  {
+   "profile_id": "dgx-spark-gb10.attachment_qa.gb10-nemotron35-lightning-nvfp4-sglang",
+   "hardware": "dgx-spark-gb10",
+   "hardware_label": "NVIDIA DGX Spark (GB10)",
+   "deployment": "Local model server: model, LibraOS and database on one box; each profile's requirements list any external service",
+   "task": "attachment_qa",
+   "task_label": "Financial-filing Q&A, document attached",
+   "model": "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-NVFP4",
+   "served_name": "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-NVFP4",
+   "status": "not_yet_validated",
+   "status_text": "Not yet validated.",
+   "serving": {
+    "engine": "SGLang + DSpark draft",
+    "recipe": "MiaAI-Lab/Nemotron3.5-Lightning-DGX-Spark-RTX-5090-6000-PRO@38c16a4",
+    "image": "lmsysorg/sglang@sha256:a04d9a1a7ffe371b05230aecab001d4ba2bfa0e5c137bc56409ecc4cbc3ac864",
+    "flags": [
+     {
+      "key": "--mem-fraction-static",
+      "value": "0.78"
+     }
+    ]
+   },
+   "settings": [],
+   "licence": {
+    "weights": "OpenMDW-1.1",
+    "flags": []
+   },
+   "red_flags": [
+    {
+     "code": "does_not_read_documents",
+     "text": "Answers without reading the document."
+    }
+   ],
+   "requirements": {
+    "deployment": "hybrid",
+    "gpu": {
+     "vendor": "nvidia",
+     "families": [
+      "GB10"
+     ],
+     "min_count": 1,
+     "min_memory_gib_per_gpu": null,
+     "min_memory_gib_total": 115,
+     "unified_memory": true
+    },
+    "system": {
+     "min_ram_gib": null,
+     "arch": [
+      "arm64"
+     ],
+     "os": [
+      "linux"
+     ]
+    },
+    "runtime": {
+     "engine": "sglang",
+     "min_driver": null
+    },
+    "external_services": [
+     "gateway_embeddings"
+    ],
+    "libraos": {
+     "min": "v0.1.22",
+     "max": null
+    }
+   }
+  },
+  {
+   "profile_id": "dgx-spark-gb10.attachment_qa.gb10-ling30-flash-int4-sglang",
+   "hardware": "dgx-spark-gb10",
+   "hardware_label": "NVIDIA DGX Spark (GB10)",
+   "deployment": "Local model server: model, LibraOS and database on one box; each profile's requirements list any external service",
+   "task": "attachment_qa",
+   "task_label": "Financial-filing Q&A, document attached",
+   "model": "inclusionAI/Ling-3.0-flash-int4",
+   "served_name": "inclusionAI/Ling-3.0-flash-int4",
+   "status": "crashed_on_this_hardware",
+   "status_text": "Crashed this hardware in our testing.",
+   "serving": null,
+   "settings": [],
+   "licence": {
+    "weights": "MIT",
+    "flags": [
+     {
+      "code": "component_licence_unclear",
+      "text": "A serving component's licence is unclear."
+     },
+     {
+      "code": "recipe_has_no_licence",
+      "text": "The serving recipe repository has no licence file."
+     }
+    ]
+   },
+   "red_flags": [
+    {
+     "code": "crashed_on_hardware",
+     "text": "Crashed this hardware in our testing."
+    }
+   ],
+   "requirements": {
+    "deployment": "hybrid",
+    "gpu": {
+     "vendor": "nvidia",
+     "families": [
+      "GB10"
+     ],
+     "min_count": 1,
+     "min_memory_gib_per_gpu": null,
+     "min_memory_gib_total": 115,
+     "unified_memory": true
+    },
+    "system": {
+     "min_ram_gib": null,
+     "arch": [
+      "arm64"
+     ],
+     "os": [
+      "linux"
+     ]
+    },
+    "runtime": {
+     "engine": "sglang",
+     "min_driver": null
+    },
+    "external_services": [
+     "gateway_embeddings"
+    ],
+    "libraos": {
+     "min": "v0.1.22",
+     "max": null
+    }
+   }
+  },
+  {
+   "profile_id": "dgx-spark-gb10.attachment_qa.gb10-muse-glimmer-30b-nvfp4-vllm",
+   "hardware": "dgx-spark-gb10",
+   "hardware_label": "NVIDIA DGX Spark (GB10)",
+   "deployment": "Local model server: model, LibraOS and database on one box; each profile's requirements list any external service",
+   "task": "attachment_qa",
+   "task_label": "Financial-filing Q&A, document attached",
+   "model": "RedHatAI/Muse-Glimmer-30B-NVFP4",
+   "served_name": null,
+   "status": "crashed_on_this_hardware",
+   "status_text": "Crashed this hardware in our testing.",
+   "serving": null,
+   "settings": [],
+   "licence": {
+    "weights": "Apache-2.0 + Meta usage policy",
+    "flags": [
+     {
+      "code": "restricts_legal_financial_use",
+      "text": "Usage policy restricts legal or financial professional use."
+     }
+    ]
+   },
+   "red_flags": [
+    {
+     "code": "crashed_on_hardware",
+     "text": "Crashed this hardware in our testing."
+    },
+    {
+     "code": "licence_restricts_legal_financial",
+     "text": "Licence restricts legal or financial use."
+    }
+   ],
+   "requirements": {
+    "deployment": "hybrid",
+    "gpu": {
+     "vendor": "nvidia",
+     "families": [
+      "GB10"
+     ],
+     "min_count": 1,
+     "min_memory_gib_per_gpu": null,
+     "min_memory_gib_total": 115,
+     "unified_memory": true
+    },
+    "system": {
+     "min_ram_gib": null,
+     "arch": [
+      "arm64"
+     ],
+     "os": [
+      "linux"
+     ]
+    },
+    "runtime": {
+     "engine": "vllm",
+     "min_driver": null
+    },
+    "external_services": [
+     "gateway_embeddings"
+    ],
+    "libraos": {
+     "min": "v0.1.22",
+     "max": null
+    }
+   }
+  },
+  {
+   "profile_id": "gateway.attachment_qa.gateway-qwen36-35b-a3b-262k",
+   "hardware": "gateway",
+   "hardware_label": "Hosted model gateway",
+   "deployment": "Hosted: model calls go to the inference gateway",
+   "task": "attachment_qa",
+   "task_label": "Financial-filing Q&A, document attached",
+   "model": "Qwen/Qwen3.6-35B-A3B",
+   "served_name": null,
+   "status": "validation_stale",
+   "status_text": "Was validated on an older LibraOS release; re-validation pending.",
+   "serving": null,
+   "settings": [
+    {
+     "key": "OPENAI_MODEL",
+     "value": "Qwen/Qwen3.6-35B-A3B"
+    },
+    {
+     "key": "LIBRA_OS_BRAIN_MODEL",
+     "value": "Qwen/Qwen3.6-35B-A3B"
+    },
+    {
+     "key": "LIBRA_OS_SKILL_MODEL",
+     "value": "Qwen/Qwen3.6-35B-A3B"
+    },
+    {
+     "key": "LIBRA_OS_LLM_MAX_CONTEXT",
+     "value": "262144"
+    }
+   ],
+   "licence": null,
+   "red_flags": [],
+   "requirements": {
+    "deployment": "gateway",
+    "gpu": null,
+    "system": {
+     "min_ram_gib": null,
+     "arch": null,
+     "os": null
+    },
+    "runtime": {
+     "engine": null,
+     "min_driver": null
+    },
+    "external_services": [
+     "gateway_llm",
+     "gateway_embeddings"
+    ],
+    "libraos": {
+     "min": null,
+     "max": null
+    }
+   }
+  },
+  {
+   "profile_id": "gateway.attachment_qa.gateway-glm53-flash-1m-cap64k",
+   "hardware": "gateway",
+   "hardware_label": "Hosted model gateway",
+   "deployment": "Hosted: model calls go to the inference gateway",
+   "task": "attachment_qa",
+   "task_label": "Financial-filing Q&A, document attached",
+   "model": "zai-org/GLM-5.3-Flash",
+   "served_name": null,
+   "status": "not_yet_validated",
+   "status_text": "Not yet validated.",
+   "serving": null,
+   "settings": [
+    {
+     "key": "OPENAI_MODEL",
+     "value": "zai-org/GLM-5.3-Flash"
+    },
+    {
+     "key": "LIBRA_OS_BRAIN_MODEL",
+     "value": "zai-org/GLM-5.3-Flash"
+    },
+    {
+     "key": "LIBRA_OS_SKILL_MODEL",
+     "value": "zai-org/GLM-5.3-Flash"
+    },
+    {
+     "key": "LIBRA_OS_LLM_MAX_CONTEXT",
+     "value": "1048576"
+    },
+    {
+     "key": "LIBRA_OS_WORKING_SET_FULL_MAX_TOKENS",
+     "value": "65536"
+    }
+   ],
+   "licence": null,
+   "red_flags": [],
+   "requirements": {
+    "deployment": "gateway",
+    "gpu": null,
+    "system": {
+     "min_ram_gib": null,
+     "arch": null,
+     "os": null
+    },
+    "runtime": {
+     "engine": null,
+     "min_driver": null
+    },
+    "external_services": [
+     "gateway_llm",
+     "gateway_embeddings"
+    ],
+    "libraos": {
+     "min": null,
+     "max": null
+    }
+   }
+  }
+ ]
+}

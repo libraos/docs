@@ -1,0 +1,298 @@
+---
+slug: /model-recommendations
+sidebar_position: 6
+title: Model recommendations
+description: Starting points per hardware and task — model, serving engine and recipe, settings, licence notes and known problems. No measured scores.
+---
+
+import profilesData from '@site/static/catalog/starter-profiles.json';
+
+# Model recommendations
+
+## What this is
+
+A catalog of **starting points** for running Libra OS on a given piece of
+hardware, for a given task: which model to pull, which serving engine and
+recipe to run it with, which settings to set, what the licence requires you
+to check, and what has gone wrong before.
+
+**It carries no measured scores.** A profile's `status` says whether we have
+validated it, not how well it performs. If you need measured, reproducible
+numbers for the Libra OS system layer itself, see
+[Benchmarks](/benchmarks); this catalog is a different thing — a map of
+"what runs, and how to start it," not "how good is the output."
+
+Download the file directly:
+
+**[`starter-profiles.json`](https://libraos.com/docs/catalog/starter-profiles.json)**
+
+## Fields
+
+The file is a single JSON object.
+
+| Field | Meaning |
+| --- | --- |
+| `schema_version` | Integer schema version of this file. |
+| `as_of` | Date this snapshot was produced. |
+| `libraos_release` | The Libra OS release the snapshot was produced against. |
+| `notice` | A caveat to show verbatim alongside any use of the data. |
+| `statuses` | A map from each `status` value used below to a one-sentence explanation of what it means. |
+| `profiles` | The list of starting-point profiles described below. |
+
+Each entry in `profiles` describes one model on one piece of hardware for one task:
+
+| Field | Meaning |
+| --- | --- |
+| `profile_id` | Stable identifier for this profile. |
+| `hardware` | Machine-readable hardware identifier. Filter on this. |
+| `hardware_label` | Human-readable hardware name. |
+| `deployment` | Prose description of the deployment shape (for example, local model server vs. hosted gateway). |
+| `task` | Machine-readable task identifier. Filter on this. |
+| `task_label` | Human-readable task name. |
+| `model` | The model weights to pull. |
+| `served_name` | The model name/ID to configure the serving engine and Libra OS with, when it differs from `model`. May be `null`. |
+| `status` | One of the keys in the top-level `statuses` map. |
+| `status_text` | The explanation for `status`, copied from `statuses` for convenience. |
+| `serving` | The serving engine, recipe, container image, and launch flags, or `null` where no serving configuration is published for this profile. |
+| `settings` | A list of `{key, value}` environment settings to apply. May be empty. |
+| `licence` | Licence notes for the weights and any flags that need attention (for example, a restriction on hosted use), or `null`. |
+| `red_flags` | A list of `{code, text}` known problems with this profile. May be empty. |
+| `requirements` | Hardware, system, runtime, external-service, and minimum-Libra-OS-version requirements to check against the target machine. |
+
+Describe only what you read from the file: a future release may add fields,
+drop a profile, or change a `status`, and this page will not always be
+updated in lockstep. The `notice` field is the authoritative caveat; treat
+this table as a reading aid, not a substitute for it.
+
+## Starting points at a glance
+
+export const hardwareOrder = [...new Set(profilesData.profiles.map((p) => p.hardware_label))];
+export const taskOrder = [...new Set(profilesData.profiles.map((p) => p.task_label))];
+
+export const STATUS_SHORT = {
+  recommended_starting_point: 'recommended starting point',
+  validated: 'validated',
+  validation_stale: 'validation stale',
+  not_yet_validated: 'not yet validated',
+  crashed_on_this_hardware: 'crashed on this hardware',
+};
+
+export function shortStatus(status) {
+  return STATUS_SHORT[status] || status.replaceAll('_', ' ');
+}
+
+export function MatrixCell({hardwareLabel, taskLabel}) {
+  const rows = profilesData.profiles.filter(
+    (p) => p.hardware_label === hardwareLabel && p.task_label === taskLabel
+  );
+  if (rows.length === 0) {
+    return <>—</>;
+  }
+  const recommended = rows.find((p) => p.status === 'recommended_starting_point');
+  const rest = rows.filter((p) => p.status !== 'recommended_starting_point');
+  const counts = {};
+  for (const p of rest) {
+    counts[p.status] = (counts[p.status] || 0) + 1;
+  }
+  return (
+    <>
+      {recommended ? (
+        <div><strong>{recommended.served_name || recommended.model}</strong></div>
+      ) : (
+        <div><em>no recommended starting point yet</em></div>
+      )}
+      {Object.entries(counts).map(([status, count]) => (
+        <div
+          key={status}
+          style={
+            status === 'crashed_on_this_hardware'
+              ? {color: 'var(--ifm-color-danger)'}
+              : {color: 'var(--ifm-color-emphasis-600)', fontSize: '0.9em'}
+          }
+        >
+          {status === 'crashed_on_this_hardware' ? '⚠ ' : ''}
+          {count}&times; {shortStatus(status)}
+        </div>
+      ))}
+    </>
+  );
+}
+
+Rows are hardware, columns are task. Each cell names the
+`recommended_starting_point` profile for that pair (`served_name`, falling
+back to `model`); the lines below it count the other profiles in that cell by
+status. A crashed profile is marked with a warning triangle. `—` means no
+profile is published for that pair yet. This table is generated from
+`starter-profiles.json` at build time, so it always matches the file above.
+
+<table>
+  <thead>
+    <tr>
+      <th>Hardware</th>
+      {taskOrder.map((task) => (
+        <th key={task}>{task}</th>
+      ))}
+    </tr>
+  </thead>
+  <tbody>
+    {hardwareOrder.map((hw) => (
+      <tr key={hw}>
+        <td><strong>{hw}</strong></td>
+        {taskOrder.map((task) => (
+          <td key={task}><MatrixCell hardwareLabel={hw} taskLabel={task} /></td>
+        ))}
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+### All profiles
+
+<table>
+  <thead>
+    <tr>
+      <th>Hardware</th>
+      <th>Task</th>
+      <th>Model</th>
+      <th>Engine</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {profilesData.profiles.map((p) => (
+      <tr key={p.profile_id}>
+        <td>{p.hardware_label}</td>
+        <td>{p.task_label}</td>
+        <td>{p.served_name || p.model}</td>
+        <td>{p.serving ? p.serving.engine : '—'}</td>
+        <td>{shortStatus(p.status)}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+## For AI agents
+
+An agent can use this file directly, without logging in:
+
+1. Download `https://libraos.com/docs/catalog/starter-profiles.json`.
+2. Filter `profiles` by the target `hardware` and `task` identifiers (not the
+   `_label` fields — those are for display).
+3. Prefer the profile with `status == "recommended_starting_point"`. Never
+   pick one with `status == "crashed_on_this_hardware"`.
+4. Check that profile's `requirements` against the target machine (GPU
+   vendor/family and memory, system architecture and OS, runtime engine,
+   external services, and minimum Libra OS release) before recommending it.
+5. Report `as_of` and `libraos_release` alongside the answer, and say plainly
+   that the profiles carry no measured scores.
+
+Example — list the profiles for one hardware/task pair:
+
+```bash
+curl -s https://libraos.com/docs/catalog/starter-profiles.json \
+  | jq '.profiles[] | select(.hardware=="dgx-spark-gb10" and .task=="attachment_qa")
+        | {profile_id, status, model, served_name}'
+```
+
+Output, from the file as of this writing:
+
+```json
+{
+  "profile_id": "dgx-spark-gb10.attachment_qa.gb10-qwen38-flash-next-hibrid48-vllm",
+  "status": "recommended_starting_point",
+  "model": "myllmbox/Qwen3.8-Flash-Next-hibrid48",
+  "served_name": "Qwen/Qwen3.8-Flash-Next"
+}
+{
+  "profile_id": "dgx-spark-gb10.attachment_qa.gb10-qwen36-35b-a3b-nvfp4-vllm",
+  "status": "validated",
+  "model": "unsloth/Qwen3.6-35B-A3B-NVFP4",
+  "served_name": "unsloth/Qwen3.6-35B-A3B-NVFP4"
+}
+{
+  "profile_id": "dgx-spark-gb10.attachment_qa.gb10-qwen38-flash-next-mia-nvfp4-vllm",
+  "status": "not_yet_validated",
+  "model": "Mia-AiLab/Qwen3.8-Flash-Next-NVFP4",
+  "served_name": null
+}
+{
+  "profile_id": "dgx-spark-gb10.attachment_qa.gb10-laguna-s21-nvfp4-vllm",
+  "status": "not_yet_validated",
+  "model": "poolside/Laguna-S-2.1-NVFP4",
+  "served_name": "poolside/Laguna-S-2.1-NVFP4"
+}
+{
+  "profile_id": "dgx-spark-gb10.attachment_qa.gb10-qwen38-27b-nvfp4-sglang",
+  "status": "not_yet_validated",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4-BF16-LMHead",
+  "served_name": "Qwen/Qwen3.8-27B"
+}
+{
+  "profile_id": "dgx-spark-gb10.attachment_qa.gb10-qwen38-flash-next-mlx4-tensorfold",
+  "status": "not_yet_validated",
+  "model": "Vontra/Qwen3.8-Flash-Next-MLX-4bit-MTP",
+  "served_name": "qwen/Qwen3.8-Flash-Next-TF"
+}
+{
+  "profile_id": "dgx-spark-gb10.attachment_qa.gb10-nemotron35-lightning-nvfp4-sglang",
+  "status": "not_yet_validated",
+  "model": "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-NVFP4",
+  "served_name": "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-NVFP4"
+}
+{
+  "profile_id": "dgx-spark-gb10.attachment_qa.gb10-ling30-flash-int4-sglang",
+  "status": "crashed_on_this_hardware",
+  "model": "inclusionAI/Ling-3.0-flash-int4",
+  "served_name": "inclusionAI/Ling-3.0-flash-int4"
+}
+{
+  "profile_id": "dgx-spark-gb10.attachment_qa.gb10-muse-glimmer-30b-nvfp4-vllm",
+  "status": "crashed_on_this_hardware",
+  "model": "RedHatAI/Muse-Glimmer-30B-NVFP4",
+  "served_name": null
+}
+```
+
+A Python equivalent:
+
+```python
+import json
+import urllib.request
+
+with urllib.request.urlopen("https://libraos.com/docs/catalog/starter-profiles.json") as r:
+    data = json.load(r)
+
+matches = [
+    p for p in data["profiles"]
+    if p["hardware"] == "dgx-spark-gb10" and p["task"] == "attachment_qa"
+]
+recommended = next((p for p in matches if p["status"] == "recommended_starting_point"), None)
+```
+
+Once an agent has resolved an upstream model this way, pointing Libra OS at
+it is the same step covered in [Model settings](/model-settings) —
+`OPENAI_API_BASE`, `OPENAI_MODEL`, and the related `LIBRA_OS_*` slots. A
+profile's `settings` list gives the exact keys and values for that profile.
+
+## Inside a Libra OS installation
+
+The Desk Developer page shows these same starting points matched against the
+machine Libra OS is actually running on. If the operator has also configured
+a measured catalog, the Developer page additionally shows benchmark figures
+for that installation — this public file never does.
+
+Agents running inside an installation can call the built-in
+`models_recommend` tool instead of fetching the public file, or call the API
+directly:
+
+- `GET /v1/managed/models/recommendations` — list profiles, with a Libra OS
+  user or service-client token.
+- `GET /v1/managed/models/recommendations.md` — the same list as an
+  agent-readable guide.
+- `GET /v1/managed/models/recommendations/{profile_id}` — a single profile.
+
+## Updating
+
+This file is refreshed with each Libra OS release. Check `as_of` and
+`libraos_release` before relying on it, and re-fetch rather than caching it
+across releases.
