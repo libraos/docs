@@ -24,3 +24,35 @@
   --ifm-background-surface-color: #15233C;
   --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.08);
 }
+
+/* Blog post share buttons (src/theme/BlogPostItem/Footer). */
+.blog-share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+.blog-share__label {
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-700);
+  margin-right: 0.25rem;
+}
+.blog-share__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  color: var(--ifm-font-color-base);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+.blog-share__btn:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
