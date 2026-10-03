@@ -6,7 +6,7 @@ tags: [benchmarks]
 description: "Cloudflare's Clef decision models vs the LLM classifier on real and multilingual email triage, run locally on a DGX Spark: who finds the mail that needs a person, and what one threshold changed."
 ---
 
-Every email that reaches a Libra OS desk gets triaged: who sent it, what it is,
+Every email that reaches a LibraOS desk gets triaged: who sent it, what it is,
 what the reader has to do, which part of the business it belongs to, and
 whether it looks risky. Today that runs on an LLM. We tested Cloudflare's new
 **Clef** decision models against it: **Clef 27B** and the smaller
@@ -18,7 +18,7 @@ the LLM kept more noise out of the inbox.** For now the LLM stays in charge.
 
 ## What we measured
 
-Libra OS sorts each inbound email into one of four streams: **Needs me**,
+LibraOS sorts each inbound email into one of four streams: **Needs me**,
 **Conversations**, **Feed** and **Paper trail**. Two numbers matter most to
 the person reading the inbox:
 
