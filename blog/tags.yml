@@ -1,12 +1,12 @@
 announcements:
   label: Announcements
   permalink: /announcements
-  description: Product announcements and updates from the Libra OS team.
+  description: Product announcements and updates from the LibraOS team.
 explainers:
   label: Explainers
   permalink: /explainers
-  description: Plain-language explainers of what Libra OS is and how it works.
+  description: Plain-language explainers of what LibraOS is and how it works.
 benchmarks:
   label: Benchmarks
   permalink: /benchmarks
-  description: Measurements of Libra OS and the models it runs, with method and caveats.
+  description: Measurements of LibraOS and the models it runs, with method and caveats.

@@ -1,11 +1,11 @@
 // @ts-check
-// Libra OS — documentation + blog. SEO-friendly static build; emits llms.txt for agents.
+// LibraOS — documentation + blog. SEO-friendly static build; emits llms.txt for agents.
 const {themes: prismThemes} = require('prism-react-renderer');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Libra OS',
-  tagline: 'Build secure enterprise Knowledge Packs and employee agents with Libra OS',
+  title: 'LibraOS',
+  tagline: 'Build secure enterprise Knowledge Packs and employee agents with LibraOS',
   favicon: 'img/favicon.png',
 
   // Public site lives under libraos.com/docs/ (Caddy serves the static build there).
@@ -46,8 +46,8 @@ const config = {
         },
         blog: {
           routeBasePath: 'blog',              // blog at /docs/blog/
-          blogTitle: 'Libra OS blog',
-          blogDescription: 'Product notes and updates from the Libra OS team.',
+          blogTitle: 'LibraOS blog',
+          blogDescription: 'Product notes and updates from the LibraOS team.',
           showReadingTime: true,
           feedOptions: {type: ['rss', 'atom'], xslt: true},
           onInlineTags: 'warn',
@@ -80,8 +80,8 @@ const config = {
         generateLLMsFullTxt: true,
         docsDir: 'docs',
         includeBlog: true,
-        title: 'Libra OS',
-        description: 'Developer guides for the Libra OS runtime: agents, employee configuration, knowledge, tools, memory, and deployment.',
+        title: 'LibraOS',
+        description: 'Developer guides for the LibraOS runtime: agents, employee configuration, knowledge, tools, memory, and deployment.',
       },
     ],
   ],
@@ -89,13 +89,13 @@ const config = {
   themeConfig: {
     image: 'img/libraos-icon-white.svg',
     metadata: [
-      {name: 'keywords', content: 'sovereign AI, on-prem AI, air-gapped AI, AI operating system, AI workforce, Libra OS, digital employees'},
+      {name: 'keywords', content: 'sovereign AI, on-prem AI, air-gapped AI, AI operating system, AI workforce, LibraOS, digital employees'},
       {name: 'robots', content: 'index, follow'},
     ],
     colorMode: {defaultMode: 'dark', respectPrefersColorScheme: true},
     navbar: {
-      title: 'Libra OS',
-      logo: {alt: 'Libra OS', src: 'img/libraos-icon-black.svg', srcDark: 'img/libraos-icon-white.svg'},
+      title: 'LibraOS',
+      logo: {alt: 'LibraOS', src: 'img/libraos-icon-black.svg', srcDark: 'img/libraos-icon-white.svg'},
       items: [
         {type: 'docSidebar', sidebarId: 'docsSidebar', position: 'left', label: 'Docs'},
         {to: '/blog', label: 'Blog', position: 'left'},
@@ -131,7 +131,7 @@ const config = {
           ],
         },
       ],
-      copyright: `© 2023–${new Date().getFullYear()} Nebula Nova Inc. Libra OS — the operating system for the AI workforce. One sovereign AI layer over everything your company knows.`,
+      copyright: `© 2023–${new Date().getFullYear()} Nebula Nova Inc. LibraOS — the operating system for the AI workforce. One sovereign AI layer over everything your company knows.`,
     },
     prism: {theme: prismThemes.oneLight, darkTheme: prismThemes.oneDark},
   },
