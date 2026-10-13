@@ -92,6 +92,8 @@ Retrieval, safety and orchestration are the platform's job.
 
 ## Before you go to production
 
+- [System architecture](/architecture) — the boundary between your application,
+  the runtime, its stores, model services, and external tools.
 - [Portability contract](/portability) — what behaves identically across
   deployment shapes and what degrades. Read this before assuming a capability
   is present.

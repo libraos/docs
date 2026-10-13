@@ -110,6 +110,7 @@ const config = {
           title: 'Docs',
           items: [
             {label: 'Getting started', to: '/getting-started'},
+            {label: 'Architecture', to: '/architecture'},
             {label: 'Deployment', to: '/deployment'},
             {label: 'Security', to: '/security'},
           ],

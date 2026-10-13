@@ -62,6 +62,11 @@ it does not replace a live integration test against your server release.
   provider model availability.
 - Describe data storage separately from model, embedding, search, and callback
   processing. Avoid unconditional claims about citations, privacy, and approval.
+- Describe public contracts, observable behavior, supported configuration, and
+  capability boundaries. Do not publish internal service topology, queues,
+  database schemas, system prompts, policy algorithms, source-module paths, or
+  unreleased designs. Explain how to verify a guarantee without exposing how it
+  is implemented internally.
 - Label fragments and application-specific adapters. Async SDK calls need
   `await`; Messages `content` is a block array, while `response.text` is a helper.
 - Keep internal links under the docs base path. The build rejects broken links

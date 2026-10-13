@@ -36,7 +36,7 @@ included.
 | **Marketing** | outbound, native | The campaign action adapter — sends land as approvable actions. |
 | **Ghost** | outbound, vendor | Publish Content Studio pieces to a Ghost blog, as drafts. |
 | **Website crawler** | knowledge, native | Crawl your own sites into the knowledge layer: start URLs, depth, page cap, recrawl interval. No secrets. |
-| **Contacts** | knowledge, native | Derives CRM dossiers from what the desk has seen, on an interval. |
+| **Contacts** | knowledge, native | Derives contact context from what the desk has seen, on an interval. |
 
 **Slack, Gmail, Google Calendar, Google Drive** connect through the kernel's
 OAuth integrations rather than the table above (Google OAuth is off unless the
