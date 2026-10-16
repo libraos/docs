@@ -9,8 +9,9 @@ help widget) can read the docs cleanly.
 - **Blog** publishes to `https://libraos.com/docs/blog/`
 - **Agent feed**: `https://libraos.com/docs/llms.txt` (+ `llms-full.txt`)
 
-This repo is **private**. Only the built static site is published — the product
-source stays closed. Editing docs never exposes anything but the docs.
+This documentation repository is **public**, and its built site is published
+publicly. Keep credentials, internal incident reports and unpublished product
+designs out of documentation changes.
 
 ## Editing docs (for developers)
 
@@ -39,9 +40,10 @@ npm run build      # production build into ./build (also emits llms.txt)
 npm run serve      # preview the production build
 ```
 
-To check Python/YAML/shell examples and exercise the Python SDK request shapes
-without contacting a server, use Python 3.10+ with `libraos-sdk` and `PyYAML`
-installed, then run `python3 tools/check_examples.py`. To test a specific SDK
+To check Python/YAML/shell examples and exercise SDK and HTTP request shapes
+without contacting a server, use Python 3.10+ with `libraos-sdk`, `httpx`,
+`PyYAML` and `jsonschema` installed, then run `python3 tools/check_examples.py`.
+CI runs the same checks with Python 3.12 and SDK 2.0.0. To test a specific SDK
 checkout, set `PYTHONPATH=/path/to/sdk/python`. The script mocks HTTP responses;
 it does not replace a live integration test against your server release.
 

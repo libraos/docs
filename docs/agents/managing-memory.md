@@ -46,6 +46,17 @@ A thread ID does not grant access to another user's conversation. Ending a
 thread does not erase its stored transcript. Conversation history and extracted
 observations are separate stores; see [Calling agents](/calling-agents).
 
+## Try cross-session recall and isolation
+
+The [Memory & User Isolation recipe](https://github.com/libraos/cookbook/tree/main/recipes/memory-isolation)
+uses two ordinary users in the same organization. A stores a unique synthetic
+preference and recalls it in a fresh conversation without forwarded history.
+B must not recall it or read A's persisted conversation, including when sending
+forged identity headers. A successful conversation read by A and denial for B
+are protocol checks; recall itself is a model evaluation. Offline fixtures do
+not verify the Runtime's authorization. The recipe's live verification remains
+pending; follow its README for prerequisites and cleanup limits.
+
 ## Observational memory
 
 Off unless you turn it on:

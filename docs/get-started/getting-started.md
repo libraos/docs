@@ -195,7 +195,7 @@ docker run -d --name libraos-pg --network libraos-net \
   -e POSTGRES_USER=libraos -e POSTGRES_PASSWORD='<strong-password>' \
   -e POSTGRES_DB=libraos \
   -v libraos-pgdata:/var/lib/postgresql/data \
-  postgres:16-alpine
+  pgvector/pgvector:pg17
 
 docker run -d --name libraos --network libraos-net -p 8900:8900 \
   --ulimit memlock=-1 \
@@ -208,7 +208,7 @@ docker run -d --name libraos --network libraos-net -p 8900:8900 \
   -e OPENAI_API_KEY='<your key>' \
   -e OPENAI_MODEL='<a model your gateway serves>' \
   -v libraos-runtime:/app/data/agents/_runtime \
-  ghcr.io/libraos/libraos:<tag>
+  "ghcr.io/libraos/libraos:<tag>"
 
 curl -fsS http://localhost:8900/health
 ```
@@ -299,18 +299,21 @@ single-container Postgres above is for a laptop, not a cluster.
 
 ### What this basic setup does not include
 
-Vector retrieval needs SurrealDB. Without it the deployment falls back to a
-lexical-only store, which still answers but cannot match on meaning — and it
-says so at boot and in `GET /api/capabilities`. See
-[Deploy LibraOS](/deployment) for the knowledge-store options, and run
-`libraos doctor deployment` inside the container to check what is actually
-active:
+Document retrieval also needs a configured embedding endpoint/model and a
+compatible knowledge store. The v0.2.2 Cookbook uses Postgres with pgvector;
+SurrealDB is not required for that setup. The database image above includes
+pgvector, but that alone does not configure embeddings or enable document
+indexing. Follow [Knowledge & retrieval](/knowledge-retrieval) and check
+`GET /api/capabilities`. Run the deployment check inside the container:
 
 ```bash
 docker exec libraos libraos doctor deployment
 ```
 
 ## What's next
+
+- **[Cookbook & learning paths](/cookbook)** — minimal Runtime examples,
+  independent capability branches and complete applications.
 
 - **[Build on LibraOS](/build-on-libraos)** — the SDK, the API contract and
   the CLI. Start here if you are writing an application against a deployment.

@@ -22,6 +22,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check documentation examples (offline)
+        run: |
+          python -m pip install libraos-sdk==2.0.0 httpx==0.28.1 PyYAML==6.0.2 jsonschema==4.23.0
+          python tools/check_examples.py
       - name: Install deps
         run: npm install --no-audit --no-fund
       - name: Build (static site + llms.txt)

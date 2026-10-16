@@ -59,7 +59,13 @@ it from a checkout rather than expecting `npm install` to work.
 
 ## Worked examples
 
-The SDK repository carries runnable examples rather than snippets:
+The [Cookbook learning paths](/cookbook) are the main entry point for runnable
+Runtime tutorials: First Agent, independent Knowledge/Tools/Memory branches,
+Async Recovery, and complete applications. Each path identifies prerequisites,
+observable outcomes and failure checks. Read the recipe README alongside its
+source; some examples need companion services or multiple user identities.
+
+The SDK repository also carries examples:
 
 - **[`examples/simulator`](https://github.com/libraos/sdk/tree/main/examples/simulator)**
   — a synthetic-customer simulator for exercising an agent against generated

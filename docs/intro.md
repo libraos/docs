@@ -73,6 +73,10 @@ each class of data.
 
 ## Worked integrations
 
+Start with the [Cookbook learning paths](/cookbook): learn step by step,
+explore Knowledge/Tools/Memory independently, or run a complete application.
+
+
 - [Customer support](/guides/customer-support): ground answers in product docs,
   connect order and ticket tools, and handle escalation.
 - [Ticket routing](/guides/ticket-routing): classify tickets into structured

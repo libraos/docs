@@ -11,6 +11,10 @@ This tutorial creates a standalone persona agent and sends it a message.
 An employee record is optional. Add one when several agents need shared
 configuration; see [Employees and agents in YAML](/employee-yaml).
 
+For runnable Python, TypeScript and Bash variants, see
+[First Agent in the Cookbook](https://github.com/libraos/cookbook/tree/main/get-started/01-first-agent).
+Continue through the [learning paths](/cookbook) when you have a working reply.
+
 ## Prerequisites
 
 - A running server with working model settings: [Getting started](/getting-started).
@@ -69,11 +73,13 @@ async def main() -> None:
     async with Client(
         base_url=os.environ["LIBRA_OS_URL"],
         api_key=os.environ["LIBRA_OS_API_KEY"],
+        timeout=120,
     ) as client:
         agent = await client.agents.create(
             name="support-drafter",
             agent_type="persona",
             system=SYSTEM,
+            tool_scope="none",
         )
         agent_id = agent["id"]
         response = await client.messages.create(

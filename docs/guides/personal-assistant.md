@@ -17,7 +17,12 @@ with their LibraOS account and get an assistant that:
 
 ![The assistant answering from an uploaded document, with what it remembers about the user on the right](./img/personal-assistant-documents.png)
 
-Everything here is runnable. The code lives in the
+This is the L4 single-agent app in the [Cookbook learning paths](/cookbook).
+For smaller exercises, start with Knowledge or Memory independently. The app
+has reported live checks on kernel v0.2.2; those checks do not certify every
+provider or the separate minimal recipes.
+
+The runnable code lives in the
 [`libraos/cookbook`](https://github.com/libraos/cookbook) repository:
 
 | Folder | Step |
@@ -38,7 +43,7 @@ LibraOS app is made of.
 ## Prerequisites
 
 - Docker with Compose v2
-- Node.js 20+
+- Node.js 22.12+ (the common environment for the Cookbook web apps)
 - A model endpoint, which can be either:
   - a hosted OpenAI-compatible gateway and its key, or
   - [Ollama](https://ollama.com) on your machine, for a fully local setup.
@@ -71,7 +76,10 @@ In `.env`, set:
 - `LIBRA_OS_JWT_SECRET` to any long random string (`openssl rand -hex 32`);
 - `LIBRA_OS_ADMIN_PASSWORD`;
 - the secret after `quickstart:admin=` in `LIBRA_OS_SERVICE_CLIENTS`;
-- one model block.
+- one model block;
+- `PA_DEMO_PASSWORD` (12+ characters) for the ordinary demo user;
+- `LIBRA_OS_EMBEDDING_API_BASE` and `LIBRA_OS_EMBEDDING_MODEL` for document
+  search. Use the API base without `/v1`; the Runtime appends `/v1/embeddings`.
 
 Then start the kernel:
 
@@ -80,8 +88,10 @@ docker compose up -d
 curl http://localhost:8900/health     # {"service":"libraos","status":"ok"}
 ```
 
-The compose file runs kernel **v0.1.21**, the minimum for this tutorial.
-`curl http://localhost:8900/api/version` shows the one running.
+The current Cookbook Compose file defaults to kernel **v0.2.2** and runs
+Postgres with pgvector. `curl http://localhost:8900/api/version` shows the actual
+version. If you change `LIBRAOS_PORT`, also update the public URL, browser proxy
+configuration and registered redirect URIs as described in the recipe README.
 
 :::tip Three first-run gotchas, already handled in the compose file
 - **`LIBRA_OS_PUBLIC_URL` is required.** Tokens name it as their issuer.
@@ -126,7 +136,8 @@ password.
 ![Signed in: the userinfo the kernel verified, and the ID token claims](./img/personal-assistant-sign-in.png)
 
 **Register the app** in the kernel's `.env` (one exact redirect URI per app;
-PKCE is on by default). Then restart the kernel:
+PKCE is on by default). Preserve any other registered clients when updating
+this list, then restart the kernel:
 
 ```bash
 LIBRA_OS_OIDC_CLIENTS=signin-example=http://localhost:5173/callback,personal-assistant=http://localhost:5180/callback
@@ -179,6 +190,7 @@ name: assistant
 description: A personal assistant that answers from the signed-in user's own documents and remembers what they tell it.
 type: persona
 knowledge_bindings: ["*"]   # search every collection the CALLER may read
+tool_scope: none            # this assistant chats and retrieves; it calls no tools
 ---
 You are a personal assistant for the signed-in user.
 - Be concise and friendly. …
@@ -190,7 +202,8 @@ The frontmatter configures the agent and the body is its system prompt.
 For a normal user, that's only their own uploads.
 
 Start the kernel with the app folder mounted (the cookbook's compose file
-already does this), then install it and create a demo user:
+already does this). From the Cookbook repository root, install the app and
+create a demo user:
 
 ```bash
 apps/personal-assistant/scripts/setup.sh
@@ -278,9 +291,11 @@ await authFetch("/api/documents/upload/my-documents", { method: "POST", body: fo
 - **Indexing is off by default.** The cookbook's compose file sets
   `LIBRA_OS_SUPERNOVA_ENABLED=true`. Without it, files are stored but never
   searchable.
-- **The stock setup uses keyword search.** It has no vector database, so the
-  kernel falls back to Postgres full-text search. Ask with words that appear
-  in the document.
+- **The v0.2.2 Cookbook setup supports semantic search in Postgres with
+  pgvector.** Configure the embedding endpoint and model before uploading.
+  Allow time for indexing, check `/api/capabilities`, and inspect the response's
+  grounding and retrieved documents. An upload response alone does not prove
+  its content is searchable.
 
 Listing and deleting are one call each:
 
@@ -299,8 +314,13 @@ await authFetch(`/api/documents/rm/my-documents/${encodeURIComponent(name)}`, { 
 
 ## Step 8 — Memory
 
-Set `LIBRA_OS_OBSERVATIONAL_MEMORY=1` and the kernel remembers each user per
-agent. The app does nothing special: a new conversation simply knows.
+The Cookbook Compose file enables `LIBRA_OS_OBSERVATIONAL_MEMORY=1`.
+To check recall, teach the assistant a unique synthetic preference, start a new
+conversation, and ask for it without supplying the old messages. Then repeat as
+another ordinary user and check that the preference is not exposed. Recall is
+model-dependent; an enabled setting alone is not a successful evaluation.
+The [minimal Memory recipe](https://github.com/libraos/cookbook/tree/main/recipes/memory-isolation)
+also checks access to the stored conversation separately from model recall.
 
 ![A brand-new conversation recalling the user's peanut allergy from long-term memory](./img/personal-assistant-memory.png)
 
@@ -331,8 +351,10 @@ These features were left out on purpose. The cookbook README has the details
 for each.
 
 - **The user's own Gmail or calendar.** Connectors are organisation-wide today.
-- **Acting on the user's behalf with their approval.** Only admins can approve
-  actions that have side effects.
+- **Acting on the user's behalf with their approval.** This app has no
+  side-effecting tools or approval flow. Verify the selected Runtime's approver
+  roles and action policy before adding one. Tool Action Approval and Mission
+  Decisions are [separate contracts](/cookbook#approval-has-two-separate-contracts).
 - **Scheduled tasks,** such as a daily briefing.
 - **Seeing or deleting memory item by item.** The user sees the condensed
   notes, but can't remove one. That includes what the assistant learned in a
@@ -344,7 +366,7 @@ for each.
   say.
 - [Workspaces & memory](/workspaces-memory) and
   [Managing memory](/managing-memory): what persists, and for whom.
-- [Knowledge & retrieval](/knowledge-retrieval): vector backends, for
-  better-than-keyword search.
+- [Knowledge & retrieval](/knowledge-retrieval): configure embeddings and verify
+  the active retrieval backend.
 - [Customer support agent](/guides/customer-support): a production guide with
   tools, escalation and evaluation.

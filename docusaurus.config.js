@@ -98,6 +98,7 @@ const config = {
       logo: {alt: 'LibraOS', src: 'img/libraos-icon-black.svg', srcDark: 'img/libraos-icon-white.svg'},
       items: [
         {type: 'docSidebar', sidebarId: 'docsSidebar', position: 'left', label: 'Docs'},
+        {to: '/cookbook', label: 'Cookbook', position: 'left'},
         {to: '/blog', label: 'Blog', position: 'left'},
         {href: 'https://libraos.com/download/', label: 'Download', position: 'right'},
         {href: 'https://libraos.com/', label: 'libraos.com', position: 'right'},
@@ -110,6 +111,7 @@ const config = {
           title: 'Docs',
           items: [
             {label: 'Getting started', to: '/getting-started'},
+            {label: 'Cookbook', to: '/cookbook'},
             {label: 'Architecture', to: '/architecture'},
             {label: 'Deployment', to: '/deployment'},
             {label: 'Security', to: '/security'},
