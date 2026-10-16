@@ -14,7 +14,7 @@ obvious. This page is the short version of both.
 :::warning Auto-indexing is opt-in since v0.1.18
 
 `LIBRA_OS_SUPERNOVA_ENABLED` defaults to **`false`** from v0.1.18 onward — the
-current v0.1.19 line carries the same default. If you are coming from an
+Cookbook v0.2.2 setup explicitly enables it. If you are coming from an
 earlier release and rely on uploaded documents being indexed automatically,
 set it:
 
@@ -31,27 +31,25 @@ documents root. That should be a decision you make, not one you discover.
 
 :::
 
-## Only one backend holds vectors
+## Choose a backend for your Runtime version {#only-one-backend-holds-vectors}
 
-`LIBRA_OS_VECTOR_BACKEND` chooses where knowledge chunks live. Configuring an
-embedding model does **not** by itself mean retrieval uses embeddings — that
-depends entirely on which store you land on.
+For the **v0.2.2 Cookbook setup**, use Postgres with **pgvector 0.8+** and a
+configured embedding endpoint/model. The Compose file supplies the database;
+set `LIBRA_OS_EMBEDDING_API_BASE` (without `/v1`) and
+`LIBRA_OS_EMBEDDING_MODEL` in the kernel environment before ingesting documents.
+SurrealDB is not required for this setup.
 
-| value | vector search | survives restart |
-|---|---|---|
-| `surreal` | **yes** — hybrid keyword + semantic | yes |
-| `pgvector` | **no** — keyword only, despite the name | yes |
-| `qdrant` | **no** — keyword only, despite the name | yes |
-| `memory` | yes | **no** — wiped on every restart |
-| `auto` *(default)* | only if SurrealDB connects | depends |
+The `postgres` backend uses Postgres with pgvector for semantic retrieval.
+It is distinct from the older backend setting named `pgvector`, which provides
+lexical retrieval. Do not infer capabilities from the database image or backend
+name alone. `auto` selects according to the Runtime release and available
+services; inspect the actual result in `/api/capabilities`.
 
-**If you want semantic retrieval, deploy SurrealDB.** There is no other option
-today.
-
-`pgvector` is the one to watch: it reads like the vector-capable choice, and it
-is the one you would reach for if what you wanted was durability. A deployment
-can end up with a correctly configured embedding endpoint, a clean startup, and
-keyword-only search.
+An embedding model being configured does not establish that every document has
+been embedded. Check both the active backend and the indexed collection. For a
+minimal grounded-answer exercise, use
+[Document Q&A](https://github.com/libraos/cookbook/tree/main/recipes/document-qa)
+and test a question that the documents do not answer as well as one they do.
 
 ## Confirm retrieval is actually working
 
@@ -61,10 +59,12 @@ Ask the deployment rather than inferring it from configuration:
 curl -s $LIBRA_OS_URL/api/capabilities | jq .retrieval
 ```
 
+For example, a deployment with active semantic retrieval may report:
+
 ```json
 {
   "vector_search": true,
-  "backend": "surreal",
+  "backend": "postgres",
   "durable": true,
   "embedder_configured": true,
   "embedding_model": "Qwen/Qwen3-Embedding-8B",
@@ -116,7 +116,11 @@ To turn auto-indexing off durably, use the environment variable above.
 `POST /api/super-nova/emergency/pause` works but is held in memory only, so a
 restart, upgrade or reboot resumes indexing.
 
-## Running SurrealDB
+## Legacy deployments using SurrealDB {#running-surrealdb}
+
+This section applies only to Runtime releases that still support SurrealDB.
+Do not add it to the v0.2.2 Cookbook setup. Check your target release's supported
+backends and migration instructions before changing an existing installation.
 
 The `surrealdb/surrealdb:v3` image runs as a non-root user (uid 65532) and v3.2.4
 removed the `file://` scheme. A fresh named volume is root-owned, so the

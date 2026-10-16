@@ -47,11 +47,15 @@ The server returns HTTP 202 with a `job_id`, `agent_id`, `status: queued`, and
 `created_at`. Save the job ID in your application before starting observation.
 Closing the HTTP connection does not cancel the job.
 
-**Do not automatically retry submission.** A timed-out POST may have been
-accepted. Native job submission does not currently promise idempotency through
-an `Idempotency-Key` header; submitting again can create another run and repeat
-external actions. If no job ID came back, ask the operator to locate the
-original request before creating replacement work.
+**Do not retry an uncertain submission without verified idempotency support.**
+A timed-out POST may have been accepted. On Runtime builds supporting
+`Idempotency-Key`, save the key and exact request before the first POST and reuse
+them with the same authenticated caller and agent. A matching replay returns
+the original job; reusing a key for a different request returns a conflict.
+Confirm this behavior and retention on your installed release before relying
+on it. On builds without that guarantee, retrying can repeat external actions.
+If no job ID came back and idempotent replay is unavailable, ask the operator
+to locate the original request before creating replacement work.
 
 ## Observe and reconnect
 
@@ -101,7 +105,24 @@ action for human approval, the application must inspect that action separately
 and wait for its authorized decision and execution result. Do not translate a
 job's `done` into “email sent” or “payment completed.”
 
-## Try the runnable example
+## Cookbook: persist a recovery receipt
+
+The [Async Jobs & Recovery recipe](https://github.com/libraos/cookbook/tree/main/recipes/async-jobs)
+uses native HTTP with Python 3.12 and HTTPX. It saves a receipt before submission,
+then atomically saves the returned job ID. A later process resumes the same job;
+once the ID is known, it only queries that job. Replaying a submission whose
+response was lost requires the idempotency support described above.
+
+The recipe separates client timeout from cancellation and reads the actual job
+state after a cancellation request. Kernel v0.2.2 has a reported case where an
+orphaned job remains `running` despite a `cancelled` acknowledgement. Do not
+report cancellation as complete based only on the DELETE response.
+
+Offline tests cover lost replies, failure states and cancellation races. Live
+verification of the new recipe remains pending; this is not proof of arbitrary
+work resuming after a server restart. See [Cookbook validation](/cookbook#verify-protocol-behavior-separately-from-model-quality).
+
+## Try the streaming example {#try-the-runnable-example}
 
 [Download the SDK example](https://raw.githubusercontent.com/libraos/sdk/1a9bb6bf94cc951dbd2f6275e72abe60726dc5b8/python/examples/19_durable_run.py), save it as `durable_run.py`, then:
 

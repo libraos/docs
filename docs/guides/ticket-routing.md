@@ -13,11 +13,16 @@ template. Routing runs inside your deployment; ticket contents can still go to
 the configured model endpoint. For local-only processing, configure local models
 and dependencies as described in [Security](/security).
 
+For the smaller L1 exercise, start with the
+[Cookbook Ticket Routing recipe](https://github.com/libraos/cookbook/tree/main/recipes/ticket-routing).
+It measures schema validity separately from classification accuracy; this guide
+covers integration with a real ticketing system.
+
 ## Prerequisites
 
 - A running LibraOS deployment and an API key
-- The SDK: `pip install libraos-sdk`, with `LIBRA_OS_URL` /
-  `LIBRA_OS_API_KEY` exported
+- HTTPX and JSON Schema validation: `pip install httpx jsonschema`, with
+  `LIBRA_OS_URL` / `LIBRA_OS_API_KEY` exported
 - Access to your existing ticketing system (and its webhook or polling API)
 - **A sample of historical tickets with their human routing decisions** — this
   becomes your evaluation set
@@ -194,25 +199,54 @@ the high-volume front door.
 
 ## Step 3 — Deploy the classify call
 
-The routing call is one request returning validated JSON — no prompt
-assembly, no regex extraction:
+Use native agent chat, `POST /agents/v1/email-classifier/chat`, and read the
+structured `output`. The Cookbook's v0.2.2 checks found that `/v1/messages` and
+async jobs did not enforce the same output contract. Check parity on your
+installed release before switching endpoints. Validate the returned object
+locally before any ticket-system action; schema validity is separate from
+whether the predicted category is correct.
 
 ```python
-import json
 import os
-from libraos import Client
+import httpx
+from jsonschema import validate
 
-async def classify_ticket(c: Client, ticket_text: str) -> dict:
-    resp = await c.messages.create(
-        agent_id="email-classifier",
-        messages=[{"role": "user", "content": ticket_text}],
+# Keep this aligned with output_type.schema_inline in the agent definition.
+ROUTING_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "intent": {"type": "string", "enum": [
+            "technical", "account", "billing", "product_info", "order",
+            "feedback", "security", "compliance", "emergency", "escalation",
+        ]},
+        "priority": {"type": "string", "enum": ["critical", "high", "medium", "low"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "reasoning": {"type": "string"},
+        "language": {"type": "string"},
+        "entities": {"type": "object", "properties": {
+            "order_id": {"type": "string"},
+            "account_ref": {"type": "string"},
+            "amount": {"type": "string"},
+        }},
+    },
+    "required": ["intent", "priority", "confidence", "reasoning", "language"],
+    "additionalProperties": False,
+}
+
+async def classify_ticket(c: httpx.AsyncClient, ticket_text: str) -> dict:
+    resp = await c.post(
+        "/agents/v1/email-classifier/chat", json={"message": ticket_text},
     )
-    return json.loads(resp.text)   # content is an array; text joins text blocks
+    resp.raise_for_status()
+    result = resp.json()["output"]
+    validate(result, ROUTING_SCHEMA)
+    return result
 
 async def route(ticket: dict) -> None:
-    async with Client(
+    async with httpx.AsyncClient(
         base_url=os.environ["LIBRA_OS_URL"],
-        api_key=os.environ["LIBRA_OS_API_KEY"],
+        headers={"Authorization": f"Bearer {os.environ['LIBRA_OS_API_KEY']}"},
+        timeout=120,
     ) as c:
         result = await classify_ticket(c, ticket["text"])
         add_internal_note(ticket["id"], result["reasoning"])

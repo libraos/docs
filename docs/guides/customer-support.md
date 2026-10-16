@@ -13,6 +13,12 @@ a human — with the review trail becoming your compliance record. It runs
 inside your deployment. Hosted models, embeddings, and callbacks can still
 receive customer data; use local services when your deployment must stay offline.
 
+For a runnable L3 example, use the
+[Cookbook Customer Support recipe](https://github.com/libraos/cookbook/tree/main/recipes/customer-support).
+Learn [Knowledge and Tools independently](/cookbook) first. The recipe's v0.2.2
+setup imports an agent bundle and explicitly reloads it; passing custom-tool
+fields to agent creation is not an equivalent registration path.
+
 ## Prerequisites
 
 - A running LibraOS deployment — see [Getting started](/getting-started)
@@ -230,10 +236,15 @@ callback:
   url: https://your-app.example/libraos/tools
 ```
 
-`lookup_order` is read-only and runs freely. `create_ticket` declares
+`lookup_order` is read-only; its backend must still authorize access to the order. `create_ticket` declares
 `side_effects: true` with a risk tier — it routes through the approval path
-instead of firing silently. The
-[legaltech example](https://github.com/libraos/sdk/tree/main/examples/legaltech)
+instead of firing silently when the deployment's approval policy requires it.
+Verify rejection, approver permissions and an execution receipt before enabling
+business mutations. This is Tool Action Approval, separate from a Mission
+Decision; see [the two contracts](/cookbook#approval-has-two-separate-contracts).
+For a smaller read-only example with signed callback evidence, use
+[Order Lookup](https://github.com/libraos/cookbook/tree/main/recipes/tool-calling).
+The [legaltech example](https://github.com/libraos/sdk/tree/main/examples/legaltech)
 shows a complete webhook implementation (FastAPI, idempotency, signature
 verification).
 
