@@ -16,11 +16,16 @@ Plan the database, model services, storage, and credentials alongside the binary
 | --- | --- | --- |
 | **Managed cloud** | Managed environment; [private-beta access](/cloud) | Getting started fast, smaller teams |
 | **Your cloud** | Your infrastructure and configured data boundary | Firms with a cloud footprint and compliance requirements |
-| **Air-gapped on-prem** | Your hardware, offline license, no phone-home | Work that cannot leave the building |
+| **Air-gapped on-prem** | Your hardware, local models and dependencies, external connections disabled | Work that must stay within an isolated environment |
 
-In the self-hosted modes there is no per-seat cloud dependency and no phone-home
-— the license is validated offline. On-premise deployments can also run
-networked behind your firewall if full air-gapping isn't required.
+The Developer License MVP is an account or organization record, not an activation
+mechanism. The Runtime does not validate a local license, phone home to enforce
+licensing, or unlock features through that record. Permitted use is governed by
+the LICENSE distributed with your release and any applicable commercial agreement.
+
+On-premise deployments can also run networked behind your firewall if full
+air-gapping is not required. Self-hosting alone does not keep model or connector
+requests local: external providers receive the information sent to them.
 
 The binary size varies by release. A working deployment also needs a database,
 model endpoint, and any storage or tool backends required by the application.

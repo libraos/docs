@@ -6,3 +6,7 @@ explainers:
   label: Explainers
   permalink: /explainers
   description: Plain-language explainers of what LibraOS is and how it works.
+benchmarks:
+  label: Benchmarks
+  permalink: /benchmarks
+  description: Measurements of LibraOS and the models it runs, with method and caveats.

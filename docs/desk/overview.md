@@ -54,8 +54,8 @@ Three problems this dissolves, together:
   school, one hallucinated sentence sent to a client is a liability event.
   Desk resolves the tension instead of picking a side: the AI does the
   volume, a person keeps the signature.
-- **Nobody staffs a platform team for this.** Helpdesk, CRM, knowledge, and
-  the AI layer arrive pre-fused around the one loop, on one deployment.
+- **Nobody staffs a platform team for this.** Intake, contact context, knowledge,
+  and the AI layer arrive around the same review loop, on one deployment.
 
 The economics in one line: Desk converts *replying* — minutes of an expert's
 time per message — into *reviewing*, seconds, without converting
@@ -71,7 +71,7 @@ The left rail is deliberately short — five doors, one loop:
 |---|---|
 | **Today** | One attention queue: what is ready for your decision, what still needs a response, what is done. Carries the badge that counts only decisions *you* can make. |
 | **Tickets** | The shared support queue, grouped by what should happen next — *needs a draft*, *awaiting approval*, *replied* — rather than by ticket status. Shown to members of a reviewing group, and to admins. |
-| **Contacts** | The CRM records the work is about. |
+| **Contacts** | Contact context referenced by the desk's customer work. |
 | **Mailbox** | Each member's own work mailbox, read through the corporate connection (Microsoft 365 or Google Workspace) — reply, summarize, share a thread into the knowledge layer. |
 | **Connections** | Which services this desk is connected to. Admin-only today. |
 
@@ -80,7 +80,7 @@ behind cross-links from the records above:
 
 | Surface | What it is |
 |---|---|
-| **Organizations** | Account-level CRM records; contacts roll up into them. |
+| **Organizations** | Organization context that groups related contacts. |
 | **Projects** | Where incoming work is filed. Every ticket, thread, and document is classified into a project by routing rules an admin sets; a review queue catches what the classifier was unsure about. A project's page carries its own knowledge — the documents an agent grounds its answers in ([how this layer works](/workspaces-memory)). |
 | **Content Studio** | Drafting long-form content under the same approval discipline; can publish as a draft to a connected blog. |
 | **Campaigns** | Segment, draft, approve, and send email campaigns. The send engine is governed, not just drafted: canary-first staged fan-out, a per-stage bounce/complaint gate that pauses the campaign until a person resumes it, per-contact frequency caps, consent re-checked per send, and an idempotent send ledger so a crashed worker can never double-send. One-click unsubscribe is built in. |

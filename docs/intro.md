@@ -18,6 +18,10 @@ You can use the Python SDK, native HTTP APIs, or compatible model APIs.
 [Libra Desk](/desk) is one application built on this runtime; you can build
 your own without adopting Desk's interface or workflow.
 
+[System architecture](/architecture) maps the customer-owned application,
+LibraOS public interfaces, runtime responsibilities, configured dependencies,
+and current capability boundaries without exposing internal implementation.
+
 ## Start with a working agent
 
 1. **Run the server:** [Getting started](/getting-started) covers installation,
@@ -63,7 +67,9 @@ Self-hosting controls where the runtime and its stores run. Hosted models,
 embedding services, web search, and tool callbacks can still receive data.
 For an offline deployment, configure local models and embeddings and check
 each tool's dependencies. [Security](/security) explains the boundaries;
-[portability](/portability) explains which capabilities depend on the environment.
+[portability](/portability) explains which capabilities depend on the environment;
+and [data ownership](/data-ownership) identifies the authoritative system for
+each class of data.
 
 ## Worked integrations
 
