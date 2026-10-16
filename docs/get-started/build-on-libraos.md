@@ -1,11 +1,11 @@
 ---
 slug: /build-on-libraos
 sidebar_position: 6
-title: Build on Libra OS
+title: Build on LibraOS
 description: The SDK, the API contract and the CLI — what a developer installs, what is generated from the spec, and what to reach for first.
 ---
 
-# Build on Libra OS
+# Build on LibraOS
 
 Everything the product does is reachable over HTTP, and everything in this
 guide is something an application can do without a change to the server. This

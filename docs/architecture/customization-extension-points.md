@@ -7,7 +7,7 @@ description: Map a desired behavior change to application code, APIs, agent file
 
 # Customization & extension points
 
-Customize Libra OS through published contracts. Internal services, prompts,
+Customize LibraOS through published contracts. Internal services, prompts,
 database tables, and source modules are not extension points and can change
 without compatibility guarantees.
 
@@ -63,5 +63,5 @@ OpenAPI contract. If the required field or behavior is absent, treat it as an
 unsupported capability rather than editing runtime internals and documenting
 that edit as a stable integration.
 
-Start with [Build on Libra OS](/build-on-libraos), [Calling agents](/calling-agents),
+Start with [Build on LibraOS](/build-on-libraos), [Calling agents](/calling-agents),
 and the [Portability contract](/portability).

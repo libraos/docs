@@ -13,7 +13,7 @@ page is how you give an agent the live web, and how to trust what comes back.
 
 The hard part is not fetching. It is knowing **what you got**: a page the
 system actually read, a snippet a search engine showed it, or a model's prose
-*about* a page it never opened. Libra OS labels all three, and the labels are
+*about* a page it never opened. LibraOS labels all three, and the labels are
 the point.
 
 ## Turn it on
@@ -61,7 +61,7 @@ two fields before you trust a quote.
 | --- | --- |
 | `search_snippet` | The snippet a search engine returned |
 | `provider_excerpt` | Page text the provider's crawler fetched |
-| `page_extract` | Page text **Libra OS itself** fetched |
+| `page_extract` | Page text **LibraOS itself** fetched |
 | `provider_summary` | The provider's generated prose *about* the page |
 | `model_answer` | A model's answer to your query — not a source at all |
 
@@ -108,7 +108,7 @@ assembled message: a response-language directive, formatting rules,
 conversation history, then the user's actual question. Left alone, the planner
 decomposes *all of it*, and fragments of your own system prompt can end up as
 search queries at a third-party provider. Passing the question as its own
-field prevents that. Libra OS also refuses to send assembled-prompt text as a
+field prevents that. LibraOS also refuses to send assembled-prompt text as a
 query, but the explicit field is better than the guard.
 
 Server-side budgets exist for the long paths —
@@ -136,7 +136,7 @@ silently degraded.
 
 ## When a source refuses
 
-Not every page can be read, and Libra OS reports why rather than failing
+Not every page can be read, and LibraOS reports why rather than failing
 generically:
 
 - **`blocked_policy`** — the publisher's `robots.txt` disallows this path, or
@@ -146,7 +146,7 @@ generically:
 - **`blocked_soft`** — the site returned an anti-bot challenge with a `200`
   status. The refusal names the vendor where it can be identified.
 
-Libra OS does not evade these. No fingerprint spoofing, no CAPTCHA solving, no
+LibraOS does not evade these. No fingerprint spoofing, no CAPTCHA solving, no
 proxy rotation. A wall is reported as a wall — a refusal you can see beats
 content you cannot trust.
 

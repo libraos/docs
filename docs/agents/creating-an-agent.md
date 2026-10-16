@@ -179,7 +179,7 @@ Select the registered agent with `metadata.agent_id`; the `model` field has
 a separate role. See the exact request in [Calling agents](/calling-agents).
 
 The SDK also exposes managed-agent APIs. Direct HTTP callers need the
-`anthropic-beta: managed-agents-2026-04-01` header on `/v1/agents`; the Libra OS
+`anthropic-beta: managed-agents-2026-04-01` header on `/v1/agents`; the LibraOS
 SDK supplies it automatically. Compatibility is limited to the fields and
 behaviors implemented by your server release.
 

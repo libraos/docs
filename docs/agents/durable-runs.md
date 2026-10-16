@@ -8,7 +8,7 @@ description: Submit a task once, reconnect to its progress, and inspect its pers
 # Run background tasks
 
 Build long-running work into your own application using the native jobs API.
-Your application owns its UI and business logic; Libra OS executes the agent
+Your application owns its UI and business logic; LibraOS executes the agent
 under the submitting identity and stores the job's progress and outcome.
 The route takes an **agent ID**, not an employee ID; see
 [Calling agents](/calling-agents) for the synchronous alternatives.
@@ -21,7 +21,7 @@ releases may expose the same routes with different persistence guarantees.
 
 ## Prerequisites
 
-- A running Libra OS deployment with PostgreSQL persistence and authentication.
+- A running LibraOS deployment with PostgreSQL persistence and authentication.
 - An installed agent that supports background streaming execution.
 - A bearer token authorized to use that agent. Keep it on your application's
   backend; never embed an administrator token in browser or mobile source code.

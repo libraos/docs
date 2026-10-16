@@ -11,18 +11,18 @@ description: Identify the authoritative system for business records, documents, 
 Choose an authoritative system for each data class, then configure access,
 retention, deletion, backup, and processing location for that class.
 
-| Data class | Authoritative system | Libra OS behavior | Retention and deletion owner |
+| Data class | Authoritative system | LibraOS behavior | Retention and deletion owner |
 | --- | --- | --- | --- |
 | **Application business records** | Your application or external business system | Receives only the values placed in a request, retrieved collection, or permitted tool call | Application or external-system operator |
 | **Agent and employee definitions** | The supported management API or declarative source selected by the operator | Loads configuration used for execution; file and managed-API fields are not always interchangeable | Deployment operator |
 | **Source documents** | The collection and document source chosen by the application | Stores or references documents according to the configured document path and collection | Collection owner and deployment operator |
 | **Indexed chunks and embeddings** | The configured knowledge backend | Parses, chunks, embeds, and retrieves only when the effective configuration supports it | Deployment operator; backend changes require an explicit migration or re-ingest plan |
-| **Conversation threads** | Libra OS conversation store for the authorized caller and conversation ID | Persists endpoint-specific history according to the configured store and retention | Deployment operator and application privacy policy |
-| **Observational memory** | Libra OS memory store when enabled | Extracts scoped observations asynchronously; disabling use does not delete existing observations | Deployment operator |
-| **Persisted fields** | Libra OS structured memory for the declared scope | Merges only declared output fields using the configured rule | Application designer and deployment operator |
+| **Conversation threads** | LibraOS conversation store for the authorized caller and conversation ID | Persists endpoint-specific history according to the configured store and retention | Deployment operator and application privacy policy |
+| **Observational memory** | LibraOS memory store when enabled | Extracts scoped observations asynchronously; disabling use does not delete existing observations | Deployment operator |
+| **Persisted fields** | LibraOS structured memory for the declared scope | Merges only declared output fields using the configured rule | Application designer and deployment operator |
 | **House profile** | Managed employee profile | Makes shared operating instructions available to associated agents in the applicable context | Authorized profile editor |
-| **Jobs, events, and results** | Libra OS jobs store | Keeps the invocation request, progress, and outcome for the configured retention period | Deployment operator; the application must retain any identifier it needs longer |
-| **Approvals and runtime audit records** | The applicable Libra OS approval or audit API | Records the runtime decision or receipt exposed by that API | Deployment operator and governance policy |
+| **Jobs, events, and results** | LibraOS jobs store | Keeps the invocation request, progress, and outcome for the configured retention period | Deployment operator; the application must retain any identifier it needs longer |
+| **Approvals and runtime audit records** | The applicable LibraOS approval or audit API | Records the runtime decision or receipt exposed by that API | Deployment operator and governance policy |
 | **Credentials and secrets** | The configured identity or secret-management system | Uses credentials to authenticate callers and configured dependencies | Credential owner and deployment operator |
 
 Knowledge collections are not memory. A document intentionally placed in a
@@ -34,7 +34,7 @@ conversation, observation, persisted field, or house profile. See
 
 1. The application sends a request and the minimum context the selected
    endpoint requires.
-2. Libra OS resolves the caller, agent, collection access, and memory scope.
+2. LibraOS resolves the caller, agent, collection access, and memory scope.
 3. The runtime may read permitted documents and prior runtime state.
 4. The runtime stores the endpoint's documented state, such as a conversation,
    job event, result, or approval record.

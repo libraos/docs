@@ -7,7 +7,7 @@ description: What behaves identically everywhere, what degrades by environment, 
 
 # Portability contract
 
-Libra OS runs in three shapes: connected to a model gateway, on your own
+LibraOS runs in three shapes: connected to a model gateway, on your own
 hardware with local models, and fully air-gapped. **The same binary, the same
 agents, the same API — but not the same capabilities.**
 
@@ -15,7 +15,7 @@ This page states which is which. You will meet this seam on day one; it is
 better read than discovered.
 
 The rule throughout: **a capability that cannot run is reported, not
-simulated.** Libra OS would rather return a refusal you can see than an answer
+simulated.** LibraOS would rather return a refusal you can see than an answer
 you cannot trust.
 
 ## Identical everywhere

@@ -2,12 +2,12 @@
 slug: /editions
 sidebar_position: 3
 title: Cloud vs Self-Hosted
-description: Choose who operates Libra OS, where its stores run, and which external services process your data.
+description: Choose who operates LibraOS, where its stores run, and which external services process your data.
 ---
 
 # Cloud vs Self-Hosted
 
-Both editions use the Libra OS runtime and agent-definition format. Choose
+Both editions use the LibraOS runtime and agent-definition format. Choose
 based on who operates the deployment and where data may be stored and processed.
 
 | | Cloud | Self-Hosted |

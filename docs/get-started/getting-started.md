@@ -302,7 +302,7 @@ single-container Postgres above is for a laptop, not a cluster.
 Vector retrieval needs SurrealDB. Without it the deployment falls back to a
 lexical-only store, which still answers but cannot match on meaning — and it
 says so at boot and in `GET /api/capabilities`. See
-[Deploy Libra OS](/deployment) for the knowledge-store options, and run
+[Deploy LibraOS](/deployment) for the knowledge-store options, and run
 `libraos doctor deployment` inside the container to check what is actually
 active:
 
@@ -312,7 +312,7 @@ docker exec libraos libraos doctor deployment
 
 ## What's next
 
-- **[Build on Libra OS](/build-on-libraos)** — the SDK, the API contract and
+- **[Build on LibraOS](/build-on-libraos)** — the SDK, the API contract and
   the CLI. Start here if you are writing an application against a deployment.
 - **[Create your first agent](/creating-an-agent)** — the same thing from the
   Python SDK, with response parsing and conversation history.
@@ -320,7 +320,7 @@ docker exec libraos libraos doctor deployment
   format for shared employee defaults, prompts, tools, and knowledge bindings.
 - **[Model settings](/model-settings)** — routing tiers, pay-as-you-go vs
   token plan, covered models, local models, web search.
-- **[Deploy Libra OS](/deployment)** for your team — on-prem, VPC, or
+- **[Deploy LibraOS](/deployment)** for your team — on-prem, VPC, or
   air-gapped, plus the secrets checklist.
 - **[Security](/security)** — the model to review before connecting your
   knowledge base.

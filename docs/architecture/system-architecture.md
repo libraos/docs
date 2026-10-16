@@ -2,14 +2,14 @@
 slug: /architecture
 sidebar_position: 1
 title: System architecture
-description: The public boundary between your application, the Libra OS runtime, its stores, model services, and external tools.
+description: The public boundary between your application, the LibraOS runtime, its stores, model services, and external tools.
 ---
 
 # System architecture
 
-Libra OS is a runtime behind your application. Your application owns the user
-experience, business workflow, and business records. It calls Libra OS through
-the published APIs or SDK; Libra OS executes the selected agent and returns a
+LibraOS is a runtime behind your application. Your application owns the user
+experience, business workflow, and business records. It calls LibraOS through
+the published APIs or SDK; LibraOS executes the selected agent and returns a
 result, evidence, status, or approval state for the application to handle.
 
 This is a **public-contract view**. It deliberately shows supported boundaries,
@@ -24,7 +24,7 @@ flowchart TB
     App --- Business
   end
 
-  subgraph Public[Libra OS public boundary]
+  subgraph Public[LibraOS public boundary]
     API[HTTP APIs and SDK]
     Runtime[Agent runtime]
     Definitions[Agent definitions and tools]
@@ -63,8 +63,8 @@ outcome changes its own business workflow.
 | Layer | Owns | Does not own |
 | --- | --- | --- |
 | Your application | UI, user authentication handoff, business workflow, business records, and presentation of results or review decisions | Agent execution, retrieval implementation, or runtime persistence |
-| Libra OS public interfaces | Request and response contracts, agent selection, capability reporting, and supported configuration | Your repository layout or business state machine |
-| Libra OS runtime | Agent execution, configured model routing, retrieval, memory, job records, and governance results | The truth of records held in your business systems |
+| LibraOS public interfaces | Request and response contracts, agent selection, capability reporting, and supported configuration | Your repository layout or business state machine |
+| LibraOS runtime | Agent execution, configured model routing, retrieval, memory, job records, and governance results | The truth of records held in your business systems |
 | Deployment dependencies | The configured database, files, models, embeddings, search, and tool endpoints | Capabilities that were not configured or are not supported by the installed release |
 
 See [Component responsibilities](/component-responsibilities) for the detailed
@@ -75,11 +75,11 @@ classes that cross these boundaries.
 
 1. Your backend authenticates the caller and invokes an agent by the selector
    required by the chosen endpoint.
-2. Libra OS resolves the installed agent definition, authorization, knowledge
+2. LibraOS resolves the installed agent definition, authorization, knowledge
    bindings, memory scope, and applicable policies.
 3. The runtime uses only the model, embedding, search, and tool services that
    the deployment has configured.
-4. Libra OS returns the endpoint's documented result and status fields. Your
+4. LibraOS returns the endpoint's documented result and status fields. Your
    application decides how to display them and whether its business workflow
    should advance.
 
@@ -120,4 +120,4 @@ inside the intended boundary and verify the effective capability response. See
   each kind of data.
 - [Customization & extension points](/customization) — supported places to
   change behavior without modifying the runtime.
-- [Build on Libra OS](/build-on-libraos) — SDK, OpenAPI, clients, and examples.
+- [Build on LibraOS](/build-on-libraos) — SDK, OpenAPI, clients, and examples.

@@ -1,13 +1,13 @@
 ---
 slug: /cloud
 sidebar_position: 2
-title: Libra OS Cloud
-description: Private-beta access to a managed Libra OS deployment and the information developers need to connect.
+title: LibraOS Cloud
+description: Private-beta access to a managed LibraOS deployment and the information developers need to connect.
 ---
 
-# Libra OS Cloud
+# LibraOS Cloud
 
-Libra OS Cloud is the hosted edition, currently available through **private-beta
+LibraOS Cloud is the hosted edition, currently available through **private-beta
 onboarding**. Request access at [libraos.com/signup](https://libraos.com/signup/).
 Submitting that form requests an invitation; it does not immediately provision
 a workspace.

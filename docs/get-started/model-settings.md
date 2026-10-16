@@ -80,7 +80,7 @@ export LIBRA_OS_SKILL_MODEL=qwen3:32b
 export OPENAI_MODEL=qwen3:32b
 ```
 
-These are illustrative model names, not downloads performed by Libra OS.
+These are illustrative model names, not downloads performed by LibraOS.
 Select models that fit your hardware and support the tools your agents need.
 Local generation alone does not make embeddings, search, or callbacks local.
 
