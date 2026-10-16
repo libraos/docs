@@ -1,12 +1,12 @@
 ---
 slug: what-is-libra-os
-title: "What is Libra OS? The operating system for the AI workforce, explained"
+title: "What is LibraOS? The operating system for the AI workforce, explained"
 authors: [libraos]
 tags: [explainers]
 ---
 
-The simplest way to think about Libra OS: a desktop operating system is the
-base layer that runs your applications; **Libra OS is the base layer that
+The simplest way to think about LibraOS: a desktop operating system is the
+base layer that runs your applications; **LibraOS is the base layer that
 runs, coordinates, and supervises a team of AI employees**. One system where
 they share knowledge, hand work to each other, and complete real business
 processes end to end — inside your walls.
@@ -23,7 +23,7 @@ see [Employees, agents, and tools](/agents).
 
 ## Not one model — many, working in parallel
 
-Libra OS is model-agnostic by design. Instead of depending on a single AI
+LibraOS is model-agnostic by design. Instead of depending on a single AI
 vendor, it routes work across multiple models side by side — a planner-class
 model for the hard calls, a fast lightweight model for high-volume steps, a
 synthesis model for the final grounded answer. Each tier is just a model id
@@ -37,7 +37,7 @@ full routing story is in [Model settings](/model-settings).
 
 ## A team, not a chatbot
 
-Libra OS supports agents for specialized roles, defined
+LibraOS supports agents for specialized roles, defined
 [in YAML](/employee-yaml) or through supported APIs. The point isn't one assistant that
 answers questions — it's specialized roles collaborating on one system: one
 employee drafting the document, another researching, another handling the
@@ -52,8 +52,8 @@ took and which tools it used.
 
 ## Yours, wherever it runs
 
-Libra OS comes in [two editions](/editions) of the same product: **Libra OS
-Cloud**, available through private-beta onboarding, and **Libra OS Self-Hosted**
+LibraOS comes in [two editions](/editions) of the same product: **LibraOS
+Cloud**, available through private-beta onboarding, and **LibraOS Self-Hosted**
 on your infrastructure. Local-only processing requires local models, embeddings,
 and compatible tools. Agent definitions are portable; credentials, resources,
 and capabilities still need verification at the destination.
@@ -62,7 +62,7 @@ and capabilities still need verification at the destination.
 
 The official Python devkit, [`libraos-sdk`](https://pypi.org/project/libraos-sdk/)
 is available on PyPI. Check the installed SDK and server versions together. It speaks the same protocol as Anthropic's Managed
-Agents, so Anthropic SDK callers can point at a Libra OS deployment with a
+Agents, so Anthropic SDK callers can point at a LibraOS deployment with a
 drop-in client — see [Creating an agent](/creating-an-agent).
 
 One streaming caveat worth knowing when you build observability: while
@@ -74,7 +74,7 @@ waiting on stream events that never come.
 
 ## In one sentence
 
-Libra OS gives a team of AI employees a shared work desk — and gives you the
+LibraOS gives a team of AI employees a shared work desk — and gives you the
 supervision, citations, and audit trail to confidently hand them real work.
 
 Start with the [getting-started guide](/getting-started), or read how the
