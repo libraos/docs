@@ -59,4 +59,4 @@ do not confuse API-level restrictions with tamper-proof storage.
 ## Reporting a vulnerability
 
 Follow the [security policy](https://github.com/libraos/community/security/policy)
-for private disclosure, or email `contact@meganova.ai`.
+for private disclosure, or email `contact@libraos.com`.

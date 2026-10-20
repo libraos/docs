@@ -130,7 +130,7 @@ const config = {
           items: [
             {label: 'Report a bug', href: 'https://github.com/libraos/community'},
             {label: 'SDK', href: 'https://github.com/libraos/sdk'},
-            {label: 'Contact', href: 'mailto:contact@meganova.ai'},
+            {label: 'Contact', href: 'mailto:contact@libraos.com'},
           ],
         },
       ],
