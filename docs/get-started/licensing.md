@@ -63,7 +63,7 @@ commercial licence (§5). It is agreed in writing, and sets the fees, the scale
 of deployment and the support terms. A signed agreement takes precedence over
 the LICENSE for what it covers (§14).
 
-Licensing enquiries: [ccao@meganova.ai](mailto:ccao@meganova.ai). See also
+Licensing enquiries: [contact@libraos.com](mailto:contact@libraos.com). See also
 [pricing](https://libraos.com/pricing/).
 
 ## Other things to know
