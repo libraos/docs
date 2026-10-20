@@ -18,10 +18,10 @@ Plan the database, model services, storage, and credentials alongside the binary
 | **Your cloud** | Your infrastructure and configured data boundary | Firms with a cloud footprint and compliance requirements |
 | **Air-gapped on-prem** | Your hardware, local models and dependencies, external connections disabled | Work that must stay within an isolated environment |
 
-The Developer License MVP is an account or organization record, not an activation
-mechanism. The Runtime does not validate a local license, phone home to enforce
-licensing, or unlock features through that record. Permitted use is governed by
-the LICENSE distributed with your release and any applicable commercial agreement.
+Every deployment mode runs under the same licence terms. A licence record in the
+Developer Console is not an activation: the runtime does not validate it, phone
+home to enforce licensing, or unlock features with it. See [Licensing](/licensing)
+for who can use LibraOS free of charge and when you need a commercial licence.
 
 On-premise deployments can also run networked behind your firewall if full
 air-gapping is not required. Self-hosting alone does not keep model or connector
