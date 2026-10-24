@@ -20,4 +20,4 @@ They are not capacity or accuracy guarantees for your application.
 | **AgentDojo** — prompt-injection defense | attack success **26.8% → 17.3%**, benign utility held at **90.7%** | Hardened without making the system useless |
 
 Full methodology and per-run data available on request —
-[contact@meganova.ai](mailto:contact@meganova.ai).
+[contact@libraos.com](mailto:contact@libraos.com).
