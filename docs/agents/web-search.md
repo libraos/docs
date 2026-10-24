@@ -127,6 +127,7 @@ For web work these are the outcomes to watch:
 | `unopened_sources` | It searched, cited what it found, and **opened none of it** |
 | `unsupported_claim` | It claimed a source it never consulted |
 | `ungrounded_no_chunks` | Nothing was retrieved and no tool ran |
+| `retrieval_not_attempted` | No knowledge search ran on this turn: the agent has no bound collections, or the request set `no_retrieval` |
 
 `unopened_sources` is the one worth alerting on. The answer is confident, the
 citations look real, and every one is a search snippet — which is not a lie,

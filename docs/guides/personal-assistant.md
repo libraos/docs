@@ -123,6 +123,8 @@ conversation in `messages` every turn, with the same `conversation_id`. When
 you send `messages`, the chat route adds nothing stored; if you send a single
 `message` with the `conversation_id` instead, it replays the thread's earlier
 turns for you (see [Continuing a conversation](/calling-agents#continuing-a-conversation)).
+A conversation ID works only on the route of the agent that recorded it;
+another agent's route answers `404`.
 
 :::caution
 `quickstart:admin` is a full-admin credential for your laptop. Real apps never

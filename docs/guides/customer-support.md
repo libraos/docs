@@ -307,8 +307,10 @@ curl --fail-with-body -sS "$LIBRA_OS_URL/agents/v1/customer-support/chat" \
 ```
 
 - `retrieval_query`: the ticket's subject or question. Without it, search
-  uses one line of the assembled message, often your last instruction, and
-  can miss the policy that answers the ticket.
+  uses one line of the assembled message, which can be one of your
+  instructions; only if that finds nothing is the whole message searched. The
+  response's `retrieval.query` and `retrieval.query_source` show what was
+  searched.
 - `no_tools`: the model only writes the draft; your backend does any lookups
   and passes the results in the message.
 - `no_memory`: one shared credential drafting for many customers should not
@@ -318,7 +320,17 @@ If your backend also supplies the policy text itself and wants the draft to say
 "this isn't covered" when that text doesn't answer the ticket, add
 `"no_retrieval": true` and leave out `retrieval_query`. The agent then reads
 nothing from its collections on that turn and does not go back to search them
-when its draft says the answer isn't there.
+when its draft says the answer isn't there. The response then reports
+`grounding: retrieval_not_attempted`.
+
+If you also send a `conversation_id` to keep a ticket's drafts together, add
+`"no_history": true` or send the history you want in `messages[]`. Otherwise
+each turn replays the earlier assembled messages exactly as sent, including
+instructions meant for an earlier draft.
+
+If one backend key drafts for many customers and must act for each of them
+with `X-End-User`, mint that key with `"allow_impersonation": true`; see
+[API keys](/calling-agents#api-keys).
 
 See [Calling agents](/calling-agents#native-chat-request) for the field reference.
 
