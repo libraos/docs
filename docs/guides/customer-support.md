@@ -292,7 +292,7 @@ curl --fail-with-body -N "$LIBRA_OS_URL/v1/chat/completions" \
 
 **Drafting backends.** If your ticket system sends LibraOS an assembled prompt
 (the customer's ticket plus your own instructions) and a person reviews the
-draft, call native chat and set three fields:
+draft, call native chat and set these fields:
 
 ```bash
 curl --fail-with-body -sS "$LIBRA_OS_URL/agents/v1/customer-support/chat" \
@@ -313,6 +313,12 @@ curl --fail-with-body -sS "$LIBRA_OS_URL/agents/v1/customer-support/chat" \
   and passes the results in the message.
 - `no_memory`: one shared credential drafting for many customers should not
   carry memory from one customer's ticket into another's reply.
+
+If your backend also supplies the policy text itself and wants the draft to say
+"this isn't covered" when that text doesn't answer the ticket, add
+`"no_retrieval": true` and leave out `retrieval_query`. The agent then reads
+nothing from its collections on that turn and does not go back to search them
+when its draft says the answer isn't there.
 
 See [Calling agents](/calling-agents#native-chat-request) for the field reference.
 
