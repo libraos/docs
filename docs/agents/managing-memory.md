@@ -36,7 +36,13 @@ turn under the same authorized identity:
 }
 ```
 
-This body belongs to `/agents/v1/{agent}/chat`. For `/v1/messages`, send the
+This body belongs to `/agents/v1/{agent}/chat`. The model sees the thread's
+earlier turns, newest first up to a token budget, and the response's
+`history_replayed` says how many earlier messages were added. Sending
+`messages[]` instead means you supply the history and nothing is replayed. See
+[Continuing a conversation](/calling-agents#continuing-a-conversation).
+
+For `/v1/messages`, send the
 `messages` array; a stable `conversation_id` (also accepted in metadata) opts
 into conversation persistence. The Python SDK can pass
 `metadata={"conversation_id": "case-4471"}`. Explicitly sending the required

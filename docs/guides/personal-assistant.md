@@ -118,9 +118,11 @@ The script does three things, and every LibraOS integration starts with them:
 3. **Chats.** `POST /agents/v1/first-assistant/chat` with `{"message":"…"}`,
    which returns `{response, conversation_id, model, …}`.
 
-`first-agent.ts` holds a two-turn conversation. The chat route does **not**
-replay history for you: send the whole conversation in `messages` every turn,
-with the same `conversation_id`.
+`first-agent.ts` holds a two-turn conversation. It sends the whole
+conversation in `messages` every turn, with the same `conversation_id`. When
+you send `messages`, the chat route adds nothing stored; if you send a single
+`message` with the `conversation_id` instead, it replays the thread's earlier
+turns for you (see [Continuing a conversation](/calling-agents#continuing-a-conversation)).
 
 :::caution
 `quickstart:admin` is a full-admin credential for your laptop. Real apps never
@@ -251,8 +253,8 @@ treats `content` as the final text (append it too and you'd double the
 answer), and takes `conversation_id` from `done`.
 
 - **`authFetch` adds the user's token,** and refreshes it once on a 401.
-- **Send the whole conversation every turn.** `conversation_id` only says
-  which thread to save the turn into.
+- **Send the whole conversation every turn.** Because the app sends
+  `messages`, `conversation_id` only says which thread to save the turn into.
 - **Replies are Markdown.** The app renders them with `react-markdown` as they
   grow; it never injects raw HTML.
 - **Streamed turns count as much as any other.** They're saved to the

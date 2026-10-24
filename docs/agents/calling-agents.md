@@ -71,9 +71,37 @@ curl --fail-with-body -sS "$LIBRA_OS_URL/agents/v1/intake/chat" \
 ```
 
 Native chat uses `message` for a simple text turn and returns fields such as
-`response`, `agent_id`, `conversation_id`, `retrieved_chunks`, and `grounding`.
-Save the returned `conversation_id` and send it with subsequent native turns
-to continue that thread.
+`response`, `agent_id`, `conversation_id`, `retrieved_chunks`, `cited_sources`,
+and `grounding`. `cited_sources` is always present: an empty list when the
+answer cited nothing.
+
+### Continuing a conversation
+
+Save the returned `conversation_id` and send it with the next `message` to
+continue that thread:
+
+```json
+{
+  "conversation_id": "chat_1786552728460381358",
+  "message": "Translate that into French."
+}
+```
+
+The model then sees the thread's earlier user and assistant turns in front of
+the new message. Only the newest turns that fit a token budget are sent; older
+turns are dropped whole, never cut in half. The budget is an operator setting,
+`LIBRA_OS_CONVERSATION_REPLAY_MAX_TOKENS` (default `8000`; `0` turns replay
+off). Only a conversation the caller owns is continued; another user's
+conversation ID is refused with `404`.
+
+If you send `messages[]` instead of `message`, you are supplying the history
+yourself and nothing stored is added. Use one approach or the other.
+
+When the request names a conversation, the response carries
+`history_replayed`: the number of earlier user and assistant messages that were
+added (`0` on a first turn, a `messages[]` request, or with replay off). The
+field is absent when the request names no conversation. Streaming turns carry
+it on the final `done` event.
 
 Optional request fields for backends that assemble their own prompts:
 
@@ -82,6 +110,7 @@ Optional request fields for backends that assemble their own prompts:
 | `retrieval_query` | string | What to search the knowledge base for, when that differs from the message. Empty or absent: the query is derived from the message. |
 | `no_tools` | boolean | Run the turn with no tools attached, even when the agent declares direct tools. Knowledge retrieval before the turn still runs. |
 | `no_memory` | boolean | Observational memory is neither read nor written on this turn. |
+| `no_retrieval` | boolean | No knowledge-base retrieval on this turn: no excerpts are added before the turn, the knowledge search tool is not offered, and the automatic search before saying "not found" does not run. Attachments sent in the conversation can still be read. |
 
 Without `retrieval_query`, a long or multi-line message is reduced to one line
 for search, normally its last line. If your backend sends a ticket followed by
@@ -97,6 +126,14 @@ knowledge base:
   "no_memory": true
 }
 ```
+
+Use `no_retrieval` when your backend puts all the context the answer may use
+into the message and wants "this isn't covered" to come back as written. Without
+it, an agent with bound collections searches them anyway: on a knowledge-bound
+agent, a draft that says the material isn't there, written when no knowledge
+search ran on that turn, is not returned. The runtime has the model search once
+and then keeps whatever it answers. That is usually what you want, but it
+overrides a caller that asked for an answer from its own pages only.
 
 These fields exist only on native chat; `/v1/messages` and
 `/v1/chat/completions` do not accept them.
