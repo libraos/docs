@@ -290,6 +290,32 @@ curl --fail-with-body -N "$LIBRA_OS_URL/v1/chat/completions" \
   }'
 ```
 
+**Drafting backends.** If your ticket system sends LibraOS an assembled prompt
+(the customer's ticket plus your own instructions) and a person reviews the
+draft, call native chat and set three fields:
+
+```bash
+curl --fail-with-body -sS "$LIBRA_OS_URL/agents/v1/customer-support/chat" \
+  -H "Authorization: Bearer $LIBRA_OS_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message": "Ticket:\n<customer text>\n\nDraft a reply. Do not promise refunds.",
+    "retrieval_query": "My order arrived two weeks late. Can I get a refund?",
+    "no_tools": true,
+    "no_memory": true
+  }'
+```
+
+- `retrieval_query`: the ticket's subject or question. Without it, search
+  uses one line of the assembled message, often your last instruction, and
+  can miss the policy that answers the ticket.
+- `no_tools`: the model only writes the draft; your backend does any lookups
+  and passes the results in the message.
+- `no_memory`: one shared credential drafting for many customers should not
+  carry memory from one customer's ticket into another's reply.
+
+See [Calling agents](/calling-agents#native-chat-request) for the field reference.
+
 Set `published: true` in the frontmatter to list the agent in curated picker
 surfaces; with `stream_phase_markers: true`, long operations stream
 human-readable progress ("searching the knowledge base…") instead of a

@@ -108,6 +108,15 @@ Different agents keep distinct observation scopes. Personal/corporate context
 separation, where enabled, adds another boundary. Sharing `owner_employee`
 does not merge the agents' observations.
 
+### Skipping memory for one turn
+
+On native chat (`POST /agents/v1/{agent}/chat`), send `"no_memory": true` to
+run that turn with observational memory neither read nor written. Use it when
+one credential serves many people, such as a backend drafting replies to
+customer tickets: without it, every ticket shares one memory log, and material
+from one customer's message could be recalled into another customer's reply.
+`/v1/messages` and `/v1/chat/completions` do not accept this field.
+
 ### Turning it off
 
 Remove `LIBRA_OS_OBSERVATIONAL_MEMORY` and restart. The runtime falls back to
