@@ -75,6 +75,32 @@ Native chat uses `message` for a simple text turn and returns fields such as
 Save the returned `conversation_id` and send it with subsequent native turns
 to continue that thread.
 
+Optional request fields for backends that assemble their own prompts:
+
+| Field | Type | Effect |
+| --- | --- | --- |
+| `retrieval_query` | string | What to search the knowledge base for, when that differs from the message. Empty or absent: the query is derived from the message. |
+| `no_tools` | boolean | Run the turn with no tools attached, even when the agent declares direct tools. Knowledge retrieval before the turn still runs. |
+| `no_memory` | boolean | Observational memory is neither read nor written on this turn. |
+
+Without `retrieval_query`, a long or multi-line message is reduced to one line
+for search, normally its last line. If your backend sends a ticket followed by
+instructions, that last line is an instruction and retrieval can come back
+empty. Set `retrieval_query` to the question you want answered from the
+knowledge base:
+
+```json
+{
+  "message": "Ticket:\n...\n\nDraft a reply in our house style.",
+  "retrieval_query": "Late delivery: can I get a refund for an order that arrived two weeks late?",
+  "no_tools": true,
+  "no_memory": true
+}
+```
+
+These fields exist only on native chat; `/v1/messages` and
+`/v1/chat/completions` do not accept them.
+
 ## Authentication, context, and memory
 
 The credential identifies the caller and its permissions. A conversation ID
