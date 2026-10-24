@@ -138,18 +138,20 @@ vary with your configuration):
 ```json
 {
   "response": "I can help with business questions — summaries, comparisons, and reports across financials, operations, and strategy.",
-  "conversation_id": "chat_1786552728460381358",
+  "conversation_id": "chat_4f1c9a0e7b2d4c6a8e3f5b1d9c7a2e60",
   "agent_id": "quickstart-assistant",
   "model": "gemini/gemini-2.5-flash",
   "retrieved_chunks": [],
-  "grounding": "ungrounded",
+  "cited_sources": [],
+  "grounding": "retrieval_not_attempted",
   "usage": { "...": "..." }
 }
 ```
 
 Two fields to notice:
 
-- **`retrieved_chunks`** is empty and **`grounding`** says so — you haven't
+- **`retrieved_chunks`** is empty and **`grounding`** says so
+  (`retrieval_not_attempted`: no knowledge search ran) — you haven't
   given it any knowledge yet. Once you ingest documents and bind them to an
   agent ([Workspaces & memory](/workspaces-memory)), this same call
   answers *from your sources* and lists the exact files each answer drew on. That list is the difference between an AI that

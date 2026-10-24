@@ -73,7 +73,10 @@ curl --fail-with-body -sS "$LIBRA_OS_URL/agents/v1/intake/chat" \
 Native chat uses `message` for a simple text turn and returns fields such as
 `response`, `agent_id`, `conversation_id`, `retrieved_chunks`, `cited_sources`,
 and `grounding`. `cited_sources` is always present: an empty list when the
-answer cited nothing.
+answer cited nothing. A retrieved document counts as cited when the answer
+names it by its source, its title, or its file name without the extension
+(whole phrase, any case; names shorter than 4 characters or made only of digits
+are not matched).
 
 ### Continuing a conversation
 
@@ -82,7 +85,7 @@ continue that thread:
 
 ```json
 {
-  "conversation_id": "chat_1786552728460381358",
+  "conversation_id": "chat_4f1c9a0e7b2d4c6a8e3f5b1d9c7a2e60",
   "message": "Translate that into French."
 }
 ```
@@ -91,32 +94,58 @@ The model then sees the thread's earlier user and assistant turns in front of
 the new message. Only the newest turns that fit a token budget are sent; older
 turns are dropped whole, never cut in half. The budget is an operator setting,
 `LIBRA_OS_CONVERSATION_REPLAY_MAX_TOKENS` (default `8000`; `0` turns replay
-off). Only a conversation the caller owns is continued; another user's
-conversation ID is refused with `404`.
+off).
+
+A conversation belongs to the caller who started it **and** to the agent it was
+recorded with. A request that names another user's conversation, or a
+conversation recorded with a different agent, is refused with the same `404`
+before the turn runs, whether it sends `message` or `messages[]`. One agent's
+thread is never replayed to another agent. When you send no conversation ID,
+the one the server issues is random (`chat_` followed by 32 hex characters), so
+it cannot be guessed.
 
 If you send `messages[]` instead of `message`, you are supplying the history
 yourself and nothing stored is added. Use one approach or the other.
 
-When the request names a conversation, the response carries
-`history_replayed`: the number of earlier user and assistant messages that were
-added (`0` on a first turn, a `messages[]` request, or with replay off). The
-field is absent when the request names no conversation. Streaming turns carry
-it on the final `done` event.
+Replay re-sends each earlier `message` exactly as it was sent, including any
+context your backend assembled into it. If you build each turn's `message`
+from selected pages, operator guidance or drafting instructions, every later
+turn gets those earlier assemblies back too, including pages the user has
+since deselected and guidance meant for an earlier draft. Such a backend should
+send the history it wants in `messages[]`, or set `"no_history": true` to skip
+replay for that turn. The model then sees only the current message, and the
+turn is still recorded in the conversation.
+
+When the request names a conversation, the response carries two counts:
+
+- `history_replayed`: the number of earlier user and assistant messages that
+  were added (`0` on a first turn, a `messages[]` request, with
+  `no_history: true`, or with replay off).
+- `history_dropped`: the number of earlier messages left out because they did
+  not fit the budget. A single turn larger than the whole budget is left out,
+  not cut, so `history_replayed: 0` with `history_dropped` above `0` means the
+  history exists but did not fit.
+
+Both are absent when the request names no conversation. Streaming turns carry
+them on the final `done` event.
 
 Optional request fields for backends that assemble their own prompts:
 
 | Field | Type | Effect |
 | --- | --- | --- |
-| `retrieval_query` | string | What to search the knowledge base for, when that differs from the message. Empty or absent: the query is derived from the message. |
+| `retrieval_query` | string | What to search the knowledge base for, when that differs from the message. Empty or absent: the query is derived from the message (see below). |
+| `no_history` | boolean | Do not replay the conversation's earlier turns on this turn. The turn is still recorded. See [Continuing a conversation](#continuing-a-conversation). |
 | `no_tools` | boolean | Run the turn with no tools attached, even when the agent declares direct tools. Knowledge retrieval before the turn still runs. |
 | `no_memory` | boolean | Observational memory is neither read nor written on this turn. |
 | `no_retrieval` | boolean | No knowledge-base retrieval on this turn: no excerpts are added before the turn, the knowledge search tool is not offered, and the automatic search before saying "not found" does not run. Attachments sent in the conversation can still be read. |
 
-Without `retrieval_query`, a long or multi-line message is reduced to one line
-for search, normally its last line. If your backend sends a ticket followed by
-instructions, that last line is an instruction and retrieval can come back
-empty. Set `retrieval_query` to the question you want answered from the
-knowledge base:
+Without `retrieval_query`, a long or multi-line message is searched by one line
+taken from it, normally its last line that is not an instruction. If that
+search finds nothing, the full message is searched once. If your backend sends
+a ticket followed by instructions, the line chosen may still be the wrong one,
+and the full-message search is a blunter fallback. Set `retrieval_query` to the
+question you want answered from the knowledge base; a query you supply is
+searched as given and never replaced:
 
 ```json
 {
@@ -138,6 +167,22 @@ overrides a caller that asked for an answer from its own pages only.
 These fields exist only on native chat; `/v1/messages` and
 `/v1/chat/completions` do not accept them.
 
+Native chat responses (and the final `done` event of a streaming turn) also
+carry these fields:
+
+| Field | Meaning |
+| --- | --- |
+| `history_replayed` | Earlier messages replayed in front of this turn. Present when the request names a conversation. |
+| `history_dropped` | Earlier messages left out by the replay budget. Present when the request names a conversation. |
+| `retrieval.query` | The text the knowledge base was searched for on this turn. |
+| `retrieval.query_source` | Where that text came from: `explicit` (your `retrieval_query`), `derived` (one line taken from the message), `full_message_fallback` (the derived line found nothing, so the full message was searched), or `message` (the message as sent). |
+| `cited_sources` | Retrieved documents the answer cites, by source, title or file name. Always present; an empty list when nothing was cited. |
+| `grounding` | How the answer relates to evidence. `retrieval_not_attempted` means no knowledge search ran on this turn, because the agent has no bound collections or the request set `no_retrieval`. |
+
+`retrieval.query` and `retrieval.query_source` are omitted when no retrieval
+ran. Read them when an answer says the material isn't there: they show what was
+actually searched.
+
 ## Authentication, context, and memory
 
 The credential identifies the caller and its permissions. A conversation ID
@@ -152,8 +197,46 @@ and identity-scoped. See [Managing memory](/managing-memory).
 
 Backend integrations serving several people must use the deployment's
 authorized identity mechanism. `X-End-User` is honored only for callers with
-the relevant impersonation capability. Never treat an employee ownership link
-or a client-supplied ID as a grant of access.
+the relevant impersonation capability; see [API keys](#api-keys). Never treat
+an employee ownership link or a client-supplied ID as a grant of access.
+
+### API keys
+
+An admin can mint two kinds of API key for backend integrations:
+
+- **Agent keys**, `POST /api/agents/{id}/keys`, reach one agent's
+  `/agents/v1/{agent}/...` routes.
+- **Service keys**, `POST /api/service-keys`, are organization-wide keys for
+  inference.
+
+The key's secret is returned once, in the mint response; store it then.
+
+```bash
+curl --fail-with-body -sS "$LIBRA_OS_URL/api/agents/intake/keys" \
+  -H "Authorization: Bearer $LIBRA_OS_ADMIN_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "ticket-backend",
+    "owner_user_id": "<service-account user id>",
+    "allow_impersonation": true
+  }'
+```
+
+A key acts as its owner. By default it cannot act for anyone else:
+
+- `allow_impersonation` (both endpoints, default `false`): only a key minted
+  with `"allow_impersonation": true` **and** owned by an admin may set
+  `X-End-User` or `X-Canonical-User` to act for other end users. A
+  shared-credential backend that serves many people through one key needs it.
+  Keys that existed before this option was added kept the capability. Key list
+  responses show `allow_impersonation` for each key.
+- `owner_user_id` (agent keys only): mint the key for another user, typically a
+  service account, instead of the admin making the call. The user must exist,
+  be active, and belong to the same organization (`404` otherwise, `400` when
+  inactive). A key owned by a non-admin never impersonates, whatever its
+  `allow_impersonation` says.
+
+Your operator can narrow impersonation further by key type.
 
 ## Handle outcomes
 

@@ -37,9 +37,13 @@ turn under the same authorized identity:
 ```
 
 This body belongs to `/agents/v1/{agent}/chat`. The model sees the thread's
-earlier turns, newest first up to a token budget, and the response's
-`history_replayed` says how many earlier messages were added. Sending
-`messages[]` instead means you supply the history and nothing is replayed. See
+earlier turns, newest first up to a token budget. The response's
+`history_replayed` says how many earlier messages were added, and
+`history_dropped` how many the budget left out. Sending `messages[]` instead
+means you supply the history and nothing is replayed; `"no_history": true`
+skips replay for one turn. A conversation continues only with the agent it was
+recorded with: naming it on another agent's route is refused with `404`, the
+same answer as another user's conversation. See
 [Continuing a conversation](/calling-agents#continuing-a-conversation).
 
 For `/v1/messages`, send the
@@ -100,8 +104,11 @@ as one universal `(API key, end user, agent)` key.
 
 For normal signed-in users, the authenticated identity is authoritative.
 `X-End-User` and `X-Canonical-User` overrides are honored only for callers with
-the deployment's impersonation capability. An authorized backend can supply
-those selectors; an arbitrary browser header cannot grant that authority.
+the deployment's impersonation capability. For an API key, that means a key
+minted with `"allow_impersonation": true` and owned by an admin; new keys do
+not have it unless asked for (see [API keys](/calling-agents#api-keys)). An
+authorized backend can supply those selectors; an arbitrary browser header
+cannot grant that authority.
 `X-Platform-User` is a legacy memory selector, not a tenant authorization claim.
 
 A shared service credential does not by itself distinguish your customers.
