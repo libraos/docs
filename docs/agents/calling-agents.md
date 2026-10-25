@@ -74,9 +74,10 @@ Native chat uses `message` for a simple text turn and returns fields such as
 `response`, `agent_id`, `conversation_id`, `retrieved_chunks`, `cited_sources`,
 and `grounding`. `cited_sources` is always present: an empty list when the
 answer cited nothing. A retrieved document counts as cited when the answer
-names it by its source, its title, or its file name without the extension
-(whole phrase, any case; names shorter than 4 characters or made only of digits
-are not matched).
+names it by its source, its title, or its file name without the extension, with
+dashes and underscores read as spaces: `shipping-policy.md` is cited by
+"Shipping policy, clause 2.1" (whole phrase, any case; names shorter than 4
+characters or made only of digits are not matched).
 
 ### Continuing a conversation
 
@@ -99,10 +100,13 @@ off).
 A conversation belongs to the caller who started it **and** to the agent it was
 recorded with. A request that names another user's conversation, or a
 conversation recorded with a different agent, is refused with the same `404`
-before the turn runs, whether it sends `message` or `messages[]`. One agent's
-thread is never replayed to another agent. When you send no conversation ID,
-the one the server issues is random (`chat_` followed by 32 hex characters), so
-it cannot be guessed.
+before the turn runs, whether it sends `message` or `messages[]`. A
+conversation continues only on the agent it was recorded with; an agent's
+built-in tool loop counts as that agent, but a separately defined agent never
+does, whatever its name. Conversations recorded before agents were tracked are
+accepted on any agent, but nothing from them is replayed. When you send no
+conversation ID, the one the server issues is random (`chat_` followed by 32
+hex characters), so it cannot be guessed.
 
 If you send `messages[]` instead of `message`, you are supplying the history
 yourself and nothing stored is added. Use one approach or the other.
