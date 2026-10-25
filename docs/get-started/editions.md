@@ -41,5 +41,5 @@ An employee bundle does not promise to move all conversation history,
 observational memory, job state, audit records, or external credentials.
 Plan those separately if your migration needs them.
 
-For current access and commercial terms, see [Cloud](/cloud) and
-[pricing](https://libraos.com/pricing/).
+For current access and commercial terms, see [Cloud](/cloud),
+[Licensing](/licensing) and [pricing](https://libraos.com/pricing/).
