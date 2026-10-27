@@ -231,6 +231,52 @@ database, not in the container.
 `LIBRA_OS_JWT_SECRET` must also be the same value across restarts — regenerate
 it and every outstanding token stops working.
 
+### Publish on loopback when only this host calls it
+
+`-p 8900:8900` listens on every interface of the host. When the only
+clients run on the same machine (a local app, a coding agent, a CLI), publish
+on loopback instead:
+
+```bash
+  -p 127.0.0.1:8900:8900 \
+```
+
+### Installing apps
+
+An app is a folder with a `nova-app.yaml` (see
+[the personal assistant guide](/guides/personal-assistant) for one). The
+server looks for apps under `LIBRA_OS_APPS_ROOT`, by default
+`/var/nova-os/apps` inside the container. Mount a host directory there so you
+can add apps without rebuilding the image:
+
+```bash
+  -v "$HOME/libraos-apps:/var/nova-os/apps" \
+```
+
+- Each app is a subdirectory named after the app:
+  `$HOME/libraos-apps/<name>/nova-app.yaml`.
+- On startup the server registers every app it finds there.
+- To add or update one while the server runs, copy the folder in and call
+  `POST /v1/apps/<name>/install` as an admin. It registers the app at once; no
+  restart is needed. `POST /v1/apps/<name>/reload` re-reads an installed app,
+  and `POST /v1/apps/<name>/uninstall` archives it.
+- Without the mount, apps live in the container's writable layer and are
+  gone on the next `docker run`.
+
+### A model on the same host
+
+Inside the container, `127.0.0.1` is the container, not your machine. To use
+a model server running on the host (Ollama, vLLM, a local gateway):
+
+- On Linux, add `--add-host=host.docker.internal:host-gateway` to `docker run`.
+  Docker Desktop on macOS and Windows provides `host.docker.internal` already.
+- Point the server at it, for example
+  `-e OPENAI_API_BASE=http://host.docker.internal:11434/v1`. The same applies
+  to `LIBRA_OS_EMBEDDING_API_BASE` and `LIBRA_OS_OLLAMA_URL`.
+- The model server must listen on an address the container can reach. One
+  that binds only `127.0.0.1` refuses the connection; bind it to the Docker
+  bridge address or `0.0.0.0` behind a host firewall.
+
 ### Kubernetes
 
 The same three requirements apply: the memlock limit, a persistent volume for
