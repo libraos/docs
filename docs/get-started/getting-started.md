@@ -351,7 +351,8 @@ Document retrieval also needs a configured embedding endpoint/model and a
 compatible knowledge store. The v0.2.2 Cookbook uses Postgres with pgvector;
 SurrealDB is not required for that setup. The database image above includes
 pgvector, but that alone does not configure embeddings or enable document
-indexing. Follow [Knowledge & retrieval](/knowledge-retrieval) and check
+indexing. A misconfigured embedding model makes every ingest fail; see
+[Embeddings](/model-settings#embeddings). Follow [Knowledge & retrieval](/knowledge-retrieval) and check
 `GET /api/capabilities`. Run the deployment check inside the container:
 
 ```bash

@@ -97,6 +97,23 @@ Knowledge-base embeddings have independent configuration:
   dimension. A change of embedding model or dimension may require reindexing;
   do not reuse an incompatible vector index.
 
+**The default, and what a failure looks like.** With no embedding variables
+set, LibraOS still embeds: it uses `OPENAI_API_BASE` and `OPENAI_API_KEY` with
+the model `Qwen/Qwen3-Embedding-8B`. Only a deployment with none of `OPENAI_API_KEY`,
+`LIBRA_OS_EMBEDDING_API_KEY` and `LIBRA_OS_OLLAMA_URL` (an Anthropic or Google
+key only) runs without an embedder; it indexes documents for keyword search
+only. So if your `OPENAI_API_BASE` is a
+chat-only server, or serves no `Qwen/Qwen3-Embedding-8B` (OpenAI itself, a local
+Ollama), set `LIBRA_OS_EMBEDDING_MODEL` to an embedding model it does serve, or
+point `LIBRA_OS_EMBEDDING_API_BASE` at one that does.
+
+When the embedding call fails, the kernel refuses the document:
+`POST /api/knowledge/ingest` answers `500` with the provider's error, for
+example `embedding API error 404: model ... not deployed`, and nothing is
+stored. Search then falls back to keyword matching over what is already
+indexed, so a new deployment returns empty results with no error. Ingest one
+test document after any change to these settings.
+
 Confirm the selected backend supports semantic retrieval using
 [the capabilities check](/portability#knowledge-retrieval).
 
