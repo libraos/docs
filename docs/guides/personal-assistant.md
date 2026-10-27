@@ -205,8 +205,9 @@ The frontmatter configures the agent and the body is its system prompt.
 `knowledge_bindings: ["*"]` means "search whatever *the caller* may read".
 For a normal user, that's only their own uploads.
 
-Start the kernel with the app folder mounted (the cookbook's compose file
-already does this). From the Cookbook repository root, install the app and
+Start the kernel with the app folder mounted at its apps root (the
+cookbook's compose file already does this; for plain Docker see
+[Installing apps](/getting-started#installing-apps)). From the Cookbook repository root, install the app and
 create a demo user:
 
 ```bash
