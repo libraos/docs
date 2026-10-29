@@ -89,15 +89,18 @@ suitability of its decisions for production use.
 
 ## Setup and compatibility
 
-Read each example's README before running its source. Tools need companion
-files, a callback secret and an allowed callback host. Memory needs two distinct
-ordinary-user tokens as well as a setup credential. Complete apps also need
+Read each example's README before running its source. Tools need kernel
+v0.3.0 or later, a callback secret and an allowed callback host. Memory needs
+two distinct ordinary-user tokens as well as a setup credential. Complete apps also need
 registered sign-in redirects and their documented Runtime configuration.
 
 The common Compose setup defaults to **kernel v0.2.2**. Check `/api/version` and
 the recipe's compatibility notes for the instance you use. Original examples
-have reported live checks on v0.2.2; the new minimal Tools, Memory and Async
-recipes have offline coverage, with live Runtime/model verification still pending.
+have reported live checks on v0.2.2. Tools requires **v0.3.0**: start it with
+`LIBRAOS_VERSION=v0.3.0`, as its README shows, and see the
+[verification record](https://github.com/libraos/cookbook/blob/main/docs/validation.md)
+for its live results by model. The new Memory and Async recipes have offline
+coverage, with live Runtime/model verification still pending.
 
 Async Recovery deliberately uses native HTTP. Its terminal success status is
 `done`; do not mix its response shape with a managed-jobs SDK example. Recovery
@@ -105,11 +108,13 @@ of an uncertain submission requires verified server support for the saved
 idempotency key. Client reconnection is separate from recovery of execution
 after a server restart. See [background tasks](/durable-runs).
 
-For v0.2.2, use each recipe's documented agent registration path and structured
-output endpoint. API creation and agent-definition files do not accept identical
+Use each recipe's documented agent registration path and structured output
+endpoint. API creation and agent-definition files do not accept identical
 fields. A successful create response alone does not prove custom tools were
-registered. Verify a job's state after requesting cancellation; an acknowledgement
-alone does not establish that execution stopped.
+registered: Tools checks for a callback receipt on every lookup. Before
+v0.3.0, custom tools on a persona never reached the model. Verify a job's
+state after requesting cancellation; an acknowledgement alone does not
+establish that execution stopped.
 
 ### Using the VS Code extension
 
