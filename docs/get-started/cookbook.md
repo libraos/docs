@@ -24,7 +24,7 @@ Mission Client and Console require Node 22.12 or newer.
 | L1 | [First Agent](https://github.com/libraos/cookbook/tree/main/get-started/01-first-agent) — Python, TypeScript or Bash | Running Runtime, model and credentials |
 | L1 | [Ticket Routing](https://github.com/libraos/cookbook/tree/main/recipes/ticket-routing) — structured output | First Agent; Python |
 | L2 · Knowledge | [Document Q&A](https://github.com/libraos/cookbook/tree/main/recipes/document-qa) | First Agent; document ingestion |
-| L2 · Tools | [Order Lookup](https://github.com/libraos/cookbook/tree/main/recipes/tool-calling) | First Agent; signed callback service and agent definition |
+| L2 · Tools | [Order Lookup](https://github.com/libraos/cookbook/tree/main/recipes/tool-calling) | First Agent; kernel v0.3.0 or later; signed callback service and agent definition |
 | L2 · Memory | [Memory & User Isolation](https://github.com/libraos/cookbook/tree/main/recipes/memory-isolation) | First Agent; memory enabled; two ordinary users |
 | L3 | [Customer Support](https://github.com/libraos/cookbook/tree/main/recipes/customer-support) | Knowledge, Tools and trusted user identity mapping |
 | L3 | [Async Jobs & Recovery](https://github.com/libraos/cookbook/tree/main/recipes/async-jobs) | First Agent; PostgreSQL-backed jobs |
@@ -89,15 +89,19 @@ suitability of its decisions for production use.
 
 ## Setup and compatibility
 
-Read each example's README before running its source. Tools need companion
-files, a callback secret and an allowed callback host. Memory needs two distinct
-ordinary-user tokens as well as a setup credential. Complete apps also need
+Read each example's README before running its source. Tools need kernel
+v0.3.0 or later, a callback secret and an allowed callback host. Memory needs
+two distinct ordinary-user tokens as well as a setup credential. Complete apps also need
 registered sign-in redirects and their documented Runtime configuration.
 
 The common Compose setup defaults to **kernel v0.2.2**. Check `/api/version` and
 the recipe's compatibility notes for the instance you use. Original examples
-have reported live checks on v0.2.2; the new minimal Tools, Memory and Async
-recipes have offline coverage, with live Runtime/model verification still pending.
+have reported live checks on v0.2.2. Tools requires **v0.3.0 or later**: start
+the kernel with `LIBRAOS_VERSION=v0.3.0`, as its README shows, and see the
+[verification record](https://github.com/libraos/cookbook/blob/main/docs/validation.md#verification-record--2026-10-29-tool-calling)
+for its live results by model, measured on fresh Compose volumes. The new
+Memory and Async recipes have offline coverage, with live Runtime/model
+verification still pending.
 
 Async Recovery deliberately uses native HTTP. Its terminal success status is
 `done`; do not mix its response shape with a managed-jobs SDK example. Recovery
@@ -105,11 +109,14 @@ of an uncertain submission requires verified server support for the saved
 idempotency key. Client reconnection is separate from recovery of execution
 after a server restart. See [background tasks](/durable-runs).
 
-For v0.2.2, use each recipe's documented agent registration path and structured
-output endpoint. API creation and agent-definition files do not accept identical
+Use each recipe's documented agent registration path and structured output
+endpoint. API creation and agent-definition files do not accept identical
 fields. A successful create response alone does not prove custom tools were
-registered. Verify a job's state after requesting cancellation; an acknowledgement
-alone does not establish that execution stopped.
+registered: before v0.3.0, `POST /v1/agents` returned success while dropping
+`custom_tools`, and custom tools on a persona agent never reached the model.
+For Tools, confirm that each lookup adds a signed callback receipt. Verify a
+job's state after requesting cancellation; an acknowledgement alone does not
+establish that execution stopped.
 
 ### Using the VS Code extension
 
