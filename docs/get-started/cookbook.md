@@ -24,7 +24,7 @@ Mission Client and Console require Node 22.12 or newer.
 | L1 | [First Agent](https://github.com/libraos/cookbook/tree/main/get-started/01-first-agent) — Python, TypeScript or Bash | Running Runtime, model and credentials |
 | L1 | [Ticket Routing](https://github.com/libraos/cookbook/tree/main/recipes/ticket-routing) — structured output | First Agent; Python |
 | L2 · Knowledge | [Document Q&A](https://github.com/libraos/cookbook/tree/main/recipes/document-qa) | First Agent; document ingestion |
-| L2 · Tools | [Order Lookup](https://github.com/libraos/cookbook/tree/main/recipes/tool-calling) | First Agent; kernel v0.3.0; signed callback service and agent definition |
+| L2 · Tools | [Order Lookup](https://github.com/libraos/cookbook/tree/main/recipes/tool-calling) | First Agent; kernel v0.3.0 or later; signed callback service and agent definition |
 | L2 · Memory | [Memory & User Isolation](https://github.com/libraos/cookbook/tree/main/recipes/memory-isolation) | First Agent; memory enabled; two ordinary users |
 | L3 | [Customer Support](https://github.com/libraos/cookbook/tree/main/recipes/customer-support) | Knowledge, Tools and trusted user identity mapping |
 | L3 | [Async Jobs & Recovery](https://github.com/libraos/cookbook/tree/main/recipes/async-jobs) | First Agent; PostgreSQL-backed jobs |
