@@ -15,9 +15,9 @@ receive customer data; use local services when your deployment must stay offline
 
 For a runnable L3 example, use the
 [Cookbook Customer Support recipe](https://github.com/libraos/cookbook/tree/main/recipes/customer-support).
-Learn [Knowledge and Tools independently](/cookbook) first. The recipe's v0.2.2
-setup imports an agent bundle and explicitly reloads it; passing custom-tool
-fields to agent creation is not an equivalent registration path.
+Learn [Knowledge and Tools independently](/cookbook) first. The recipe imports
+an agent bundle; from kernel v0.3.0 the import loads the agent itself, and
+`POST /v1/agents` also accepts `custom_tools`.
 
 ## Prerequisites
 
@@ -328,8 +328,10 @@ If you also send a `conversation_id` to keep a ticket's drafts together, add
 each turn replays the earlier assembled messages exactly as sent, including
 instructions meant for an earlier draft.
 
-If one backend key drafts for many customers and must act for each of them
-with `X-End-User`, mint that key with `"allow_impersonation": true`; see
+If one backend key drafts for many customers, keep each customer's memory
+apart with `X-Canonical-User`: with `X-End-User` alone, every customer of that
+key shares one memory log per agent. Either header needs a key minted with
+`"allow_impersonation": true` and owned by an admin; see
 [API keys](/calling-agents#api-keys).
 
 See [Calling agents](/calling-agents#native-chat-request) for the field reference.

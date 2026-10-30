@@ -94,14 +94,19 @@ v0.3.0 or later, a callback secret and an allowed callback host. Memory needs
 two distinct ordinary-user tokens as well as a setup credential. Complete apps also need
 registered sign-in redirects and their documented Runtime configuration.
 
-The common Compose setup defaults to **kernel v0.2.2**. Check `/api/version` and
-the recipe's compatibility notes for the instance you use. Original examples
-have reported live checks on v0.2.2. Tools requires **v0.3.0 or later**: start
-the kernel with `LIBRAOS_VERSION=v0.3.0`, as its README shows, and see the
-[verification record](https://github.com/libraos/cookbook/blob/main/docs/validation.md#verification-record--2026-10-29-tool-calling)
-for its live results by model, measured on fresh Compose volumes. The new
-Memory and Async recipes have offline coverage, with live Runtime/model
-verification still pending.
+The common Compose setup defaults to **kernel v0.3.0**. Check `/api/version` and
+the recipe's compatibility notes for the instance you use. Every example was
+run on v0.3.0 from fresh Compose volumes; the
+[verification record](https://github.com/libraos/cookbook/blob/main/docs/validation.md#verification-record--2026-10-29-kernel-v030-every-example)
+lists the results by model. Tools requires v0.3.0 or later. A database migrated
+by 0.3 should not be run with 0.2.x again.
+
+The local kernel keeps observational memory on, one log per signed-in identity
+and agent. Recipes that classify or extract one input at a time send
+`no_memory: true`, so earlier answers are not recalled into later ones. Recipes
+that keep memory per customer or patient through one service credential send
+`X-Canonical-User`: `X-End-User` alone leaves every end user in the same log.
+See [Managing memory](/managing-memory).
 
 Async Recovery deliberately uses native HTTP. Its terminal success status is
 `done`; do not mix its response shape with a managed-jobs SDK example. Recovery
