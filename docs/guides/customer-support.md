@@ -243,7 +243,7 @@ Verify rejection, approver permissions and an execution receipt before enabling
 business mutations. This is Tool Action Approval, separate from a Mission
 Decision; see [the two contracts](/cookbook#approval-has-two-separate-contracts).
 For a smaller read-only example with signed callback evidence, use
-[Order Lookup](https://github.com/libraos/cookbook/tree/main/recipes/tool-calling).
+[Call your systems with tools](/tool-calling), then run the linked Order Lookup recipe.
 The [legaltech example](https://github.com/libraos/sdk/tree/main/examples/legaltech)
 shows a complete webhook implementation (FastAPI, idempotency, signature
 verification).

@@ -32,7 +32,7 @@ and current capability boundaries without exposing internal implementation.
 3. **Choose an interface:** [Calling agents](/calling-agents) maps each endpoint
    to its agent selector, request shape, and response format.
 4. **Add context and actions:** bind [knowledge collections](/workspaces-memory),
-   configure [tools](/employee-yaml#skills-and-tools), and choose the
+   connect [your tools](/tool-calling), and choose the
    [memory](/managing-memory) your application needs.
 5. **Operate it:** inspect [available agents](/listing-agents), run
    [background tasks](/durable-runs), and check [deployment](/deployment)
@@ -76,7 +76,8 @@ each class of data.
 Start with the [Cookbook learning paths](/cookbook): learn step by step,
 explore Knowledge/Tools/Memory independently, or run a complete application.
 
-
+- [Signed order lookup](/tool-calling): connect a callback and verify that its
+  result supports the agent's answer.
 - [Customer support](/guides/customer-support): ground answers in product docs,
   connect order and ticket tools, and handle escalation.
 - [Ticket routing](/guides/ticket-routing): classify tickets into structured

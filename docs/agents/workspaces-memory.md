@@ -1,6 +1,6 @@
 ---
 slug: /workspaces-memory
-sidebar_position: 5
+sidebar_position: 6
 title: Knowledge, workspaces & memory
 description: Distinguish knowledge collections, filesystem workspaces, conversation history, and long-term memory.
 ---
