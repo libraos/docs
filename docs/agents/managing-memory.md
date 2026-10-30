@@ -64,8 +64,8 @@ preference and recalls it in a fresh conversation without forwarded history.
 B must not recall it or read A's persisted conversation, including when sending
 forged identity headers. A successful conversation read by A and denial for B
 are protocol checks; recall itself is a model evaluation. Offline fixtures do
-not verify the Runtime's authorization. The recipe's live verification remains
-pending; follow its README for prerequisites and cleanup limits.
+not verify the Runtime's authorization. Its live test passes on kernel v0.3.0;
+follow its README for prerequisites and cleanup limits.
 
 ## Observational memory
 
@@ -114,8 +114,12 @@ cannot grant that authority.
 A shared service credential does not by itself distinguish your customers.
 Have the operator configure and verify the supported end-user mapping, then
 test two users across two conversations before enabling long-term memory.
-Do not assume that adding only `X-End-User` establishes every required identity
-axis: canonical identity can also affect which observations are read.
+Observational memory is kept per canonical user and agent. `X-End-User` alone
+does not separate it: every end user of one credential shares the credential's
+log. To keep end users apart, send each one's stable id as `X-Canonical-User`,
+prefixed so it cannot equal a real user's id. Without the impersonation
+capability the header is ignored without an error, so verify with two end users
+before relying on it.
 
 Different agents keep distinct observation scopes. Personal/corporate context
 separation, where enabled, adds another boundary. Sharing `owner_employee`
