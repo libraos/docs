@@ -15,9 +15,9 @@ receive customer data; use local services when your deployment must stay offline
 
 For a runnable L3 example, use the
 [Cookbook Customer Support recipe](https://github.com/libraos/cookbook/tree/main/recipes/customer-support).
-Learn [Knowledge and Tools independently](/cookbook) first. The recipe's v0.2.2
-setup imports an agent bundle and explicitly reloads it; passing custom-tool
-fields to agent creation is not an equivalent registration path.
+Learn [Knowledge and Tools independently](/cookbook) first. The recipe imports
+an agent bundle; from kernel v0.3.0 the import loads the agent itself, and
+`POST /v1/agents` also accepts `custom_tools`.
 
 ## Prerequisites
 
@@ -116,7 +116,7 @@ On LibraOS those are configuration:
 | --- | --- |
 | System prompt engineering, brand voice | The persona template — a reviewed Markdown file you edit |
 | RAG pipeline (chunking, embedding, retrieval, citation) | Collections + bindings; inspect retrieval evidence and handle insufficient sources |
-| Guardrails against prompt injection, PII leaks, off-topic drift | The 3-tier AI firewall screens every request and response |
+| Guardrails against prompt injection, PII leaks, off-topic drift | The AI firewall screens requests (prompt injection, abuse) and responses; PII redaction is opt-in from v0.3.0 (`guardrails.pii_redactor: enabled` on the agent, or `LIBRA_OS_PII_REDACTION=on`) |
 | Tool-use loop + API integration code | `custom_tools` with a webhook callback — no client-side loop |
 | Human-in-the-loop approval flow | `approval_group` + side-effect declarations on tools |
 | Per-customer context | Send message history or a supported thread ID; configure identity and optional observational memory separately |
@@ -272,8 +272,9 @@ This function uses the customer's authorized deployment token and passes the
 history explicitly. Your application must obtain that token and keep each
 customer's history separate. The SDK's `messages.create` does not accept a
 `headers` argument. For a shared backend credential, implement and verify the
-operator-approved identity mapping described in [Managing memory](/managing-memory);
-long-term recall is not enabled by this example.
+operator-approved identity mapping described in [Managing memory](/managing-memory),
+for example `X-Canonical-User` on native chat (see below). Long-term recall is
+not enabled by this example.
 
 **Or skip the custom front end entirely.** Every agent is exposed as an
 OpenAI-compatible model, so any chat client that speaks that protocol can
@@ -328,9 +329,13 @@ If you also send a `conversation_id` to keep a ticket's drafts together, add
 each turn replays the earlier assembled messages exactly as sent, including
 instructions meant for an earlier draft.
 
-If one backend key drafts for many customers and must act for each of them
-with `X-End-User`, mint that key with `"allow_impersonation": true`; see
-[API keys](/calling-agents#api-keys).
+If you want memory per customer instead of `no_memory`, send each customer's
+stable id as `X-Canonical-User`, prefixed so it cannot equal a real user's id
+(for example `customer:1042`). With `X-End-User` alone, every customer of that
+key shares one memory log per agent. Either header needs a key minted with
+`"allow_impersonation": true` and owned by an admin. Without that, the header is
+ignored without an error and all customers share the key's own log, so test two
+customers before relying on it. See [API keys](/calling-agents#api-keys).
 
 See [Calling agents](/calling-agents#native-chat-request) for the field reference.
 

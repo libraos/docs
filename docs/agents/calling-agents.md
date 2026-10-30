@@ -200,8 +200,11 @@ the endpoint's history behavior. Observational memory is separately enabled
 and identity-scoped. See [Managing memory](/managing-memory).
 
 Backend integrations serving several people must use the deployment's
-authorized identity mechanism. `X-End-User` is honored only for callers with
-the relevant impersonation capability; see [API keys](#api-keys). Never treat
+authorized identity mechanism. `X-End-User` and `X-Canonical-User` are honored
+only for callers with the relevant impersonation capability; see
+[API keys](#api-keys). Memory is kept per canonical user, so it is
+`X-Canonical-User` that keeps one person's memory from another's; see
+[Managing memory](/managing-memory). Never treat
 an employee ownership link or a client-supplied ID as a grant of access.
 
 ### API keys

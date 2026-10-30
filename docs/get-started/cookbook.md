@@ -94,14 +94,23 @@ v0.3.0 or later, a callback secret and an allowed callback host. Memory needs
 two distinct ordinary-user tokens as well as a setup credential. Complete apps also need
 registered sign-in redirects and their documented Runtime configuration.
 
-The common Compose setup defaults to **kernel v0.2.2**. Check `/api/version` and
-the recipe's compatibility notes for the instance you use. Original examples
-have reported live checks on v0.2.2. Tools requires **v0.3.0 or later**: start
-the kernel with `LIBRAOS_VERSION=v0.3.0`, as its README shows, and see the
-[verification record](https://github.com/libraos/cookbook/blob/main/docs/validation.md#verification-record--2026-10-29-tool-calling)
-for its live results by model, measured on fresh Compose volumes. The new
-Memory and Async recipes have offline coverage, with live Runtime/model
-verification still pending.
+The common Compose setup defaults to **kernel v0.3.0**. Check `/api/version` and
+the recipe's compatibility notes for the instance you use. Every recipe and app
+was run or built on v0.3.0 from fresh Compose volumes; the
+[verification record](https://github.com/libraos/cookbook/blob/main/docs/validation.md#verification-record--2026-10-29-kernel-v030-every-example)
+lists what was checked and the results, and the
+[Tool Calling record](https://github.com/libraos/cookbook/blob/main/docs/validation.md#verification-record--2026-10-29-tool-calling) compares
+models. Roll forward, not back: v0.2.4 boots on a database migrated by 0.3 but
+ignores its access rules.
+
+The cookbook's Compose file turns observational memory on
+(`LIBRA_OS_OBSERVATIONAL_MEMORY=1`). The kernel keeps one log per canonical user
+and agent, so every caller of one credential shares that credential's log.
+Recipes that classify or extract one input at a time send `no_memory: true`, so
+earlier answers are not recalled into later ones. Recipes that keep memory per
+customer or patient through one service credential send `X-Canonical-User`,
+which needs an impersonation-capable credential; `X-End-User` alone leaves every
+end user in the same log. See [Managing memory](/managing-memory).
 
 Async Recovery deliberately uses native HTTP. Its terminal success status is
 `done`; do not mix its response shape with a managed-jobs SDK example. Recovery
