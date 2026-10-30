@@ -1,6 +1,6 @@
 ---
 slug: /managing-memory
-sidebar_position: 7
+sidebar_position: 8
 title: Managing memory
 description: Choose conversation history, observations, persisted fields, or an employee house profile, and understand their identity scopes.
 ---

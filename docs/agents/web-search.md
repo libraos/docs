@@ -1,6 +1,6 @@
 ---
 slug: /web-search
-sidebar_position: 6
+sidebar_position: 7
 title: Web search
 description: Give an agent the live web — the four tools, what a result actually is, how to bound the spend, and how to tell a page that was read from a page that was only found.
 ---

@@ -1,6 +1,6 @@
 ---
 slug: /durable-runs
-sidebar_position: 8
+sidebar_position: 9
 title: Run background tasks
 description: Submit a task once, reconnect to its progress, and inspect its persisted outcome.
 ---

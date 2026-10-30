@@ -54,7 +54,8 @@ every live check has already passed.
 | Mission | Complete tasks and generate a report | Reconnection, replayed events, failed tasks and pending decisions |
 
 An answer that looks like an order status does not prove a tool executed.
-Check the callback receipt. Likewise, a failed memory lookup does not prove
+Check the callback receipt and [match the recorded tool result](/tool-calling).
+Likewise, a failed memory lookup does not prove
 isolation: verify that A can recall the preference and read the conversation
 before checking B's denial.
 
@@ -123,9 +124,11 @@ endpoint. API creation and agent-definition files do not accept identical
 fields. A successful create response alone does not prove custom tools were
 registered: before v0.3.0, `POST /v1/agents` returned success while dropping
 `custom_tools`, and custom tools on a persona agent never reached the model.
-For Tools, confirm that each lookup adds a signed callback receipt. Verify a
-job's state after requesting cancellation; an acknowledgement alone does not
-establish that execution stopped.
+For Tools, confirm that each lookup adds a receipt for a verified callback.
+Match the tool call and result before displaying its answer; see
+[Call your systems with tools](/tool-calling). Verify a job's state after
+requesting cancellation; an acknowledgement alone does not establish that
+execution stopped.
 
 ### Using the VS Code extension
 
