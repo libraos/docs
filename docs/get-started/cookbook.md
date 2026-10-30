@@ -100,7 +100,7 @@ was run or built on v0.3.0 from fresh Compose volumes; the
 [verification record](https://github.com/libraos/cookbook/blob/main/docs/validation.md#verification-record--2026-10-29-kernel-v030-every-example)
 lists what was checked and the results, and the
 [Tool Calling record](https://github.com/libraos/cookbook/blob/main/docs/validation.md#verification-record--2026-10-29-tool-calling) compares
-models. Roll forward, not back: v0.2.x boots on a database migrated by 0.3 but
+models. Roll forward, not back: v0.2.4 boots on a database migrated by 0.3 but
 ignores its access rules.
 
 The cookbook's Compose file turns observational memory on

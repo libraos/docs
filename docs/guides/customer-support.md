@@ -116,7 +116,7 @@ On LibraOS those are configuration:
 | --- | --- |
 | System prompt engineering, brand voice | The persona template — a reviewed Markdown file you edit |
 | RAG pipeline (chunking, embedding, retrieval, citation) | Collections + bindings; inspect retrieval evidence and handle insufficient sources |
-| Guardrails against prompt injection, PII leaks, off-topic drift | The AI firewall screens every request and response for prompt injection; PII redaction is opt-in from v0.3.0 (`guardrails.pii_redactor: enabled` on the agent, or `LIBRA_OS_PII_REDACTION=on`) |
+| Guardrails against prompt injection, PII leaks, off-topic drift | The AI firewall screens requests (prompt injection, abuse) and responses; PII redaction is opt-in from v0.3.0 (`guardrails.pii_redactor: enabled` on the agent, or `LIBRA_OS_PII_REDACTION=on`) |
 | Tool-use loop + API integration code | `custom_tools` with a webhook callback — no client-side loop |
 | Human-in-the-loop approval flow | `approval_group` + side-effect declarations on tools |
 | Per-customer context | Send message history or a supported thread ID; configure identity and optional observational memory separately |
@@ -273,8 +273,8 @@ history explicitly. Your application must obtain that token and keep each
 customer's history separate. The SDK's `messages.create` does not accept a
 `headers` argument. For a shared backend credential, implement and verify the
 operator-approved identity mapping described in [Managing memory](/managing-memory),
-for example `X-Canonical-User` on native chat (see below); the SDK's
-`messages.create` cannot set it. Long-term recall is not enabled by this example.
+for example `X-Canonical-User` on native chat (see below). Long-term recall is
+not enabled by this example.
 
 **Or skip the custom front end entirely.** Every agent is exposed as an
 OpenAI-compatible model, so any chat client that speaks that protocol can
